@@ -64,3 +64,22 @@ Future<List> loadspots() async {
 
   return jsonResponse;
 }
+
+void addsession (String userid, List userorder, String selectedgage, String category, int currentorder, int finalorder, int finaltime, int location_id) async{
+    var reqbody = {
+      "userid": userid,
+      "userorder": jsonEncode(userorder),
+      "name": selectedgage,
+      "category": category,
+      "currentorder": currentorder,
+      "finalorder": finalorder,
+      "finaltime": finaltime,
+      "location_id": location_id,
+    };
+
+    var response = await http.post(
+      Uri.parse("http://192.168.123.182:3000/sessions/add"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(reqbody),
+    );
+  }

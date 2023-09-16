@@ -64,8 +64,8 @@ class MapScreenstate extends State<MapScreen> with TickerProviderStateMixin {
     position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.best);
     initiallocation = LatLng(position.latitude, position.longitude);
-    
-    if(mounted) if(mounted) setState(() {});
+
+    if (mounted) if (mounted) setState(() {});
   }
 
   @override
@@ -176,9 +176,14 @@ class MapScreenstate extends State<MapScreen> with TickerProviderStateMixin {
                     mapType: MapType.normal,
                     markers: _markers,
                     onMapCreated: (controller) {
-                      if(mounted) setState(() {
-                        _controller = controller;
-                      });
+                      if (mounted) {
+                        return setState(
+                          () {
+                            _controller = controller;
+                            _controller.setMapStyle(MapStyle().dark);
+                          },
+                        );
+                      }
                     },
                   ),
                 ),
@@ -198,13 +203,15 @@ class MyBottomSheet extends StatefulWidget {
 }
 
 class _MyBottomSheetState extends State<MyBottomSheet> {
+
   List sessions = [];
   List filteredSessions = [];
 
   void waitforsessions() async {
     sessions = await loadsessions('qqqq');
     filteredSessions = sessions;
-    if(mounted) setState(() {});
+    if (mounted)
+      setState(() {});
   }
 
   @override
@@ -221,16 +228,16 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
       decoration: const BoxDecoration(
         color: Colors.white, // 모달 배경색
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(8), // 모달 좌상단 라운딩 처리
-          topRight: Radius.circular(8), // 모달 우상단 라운딩 처리
+          topLeft: Radius.circular(16), // 모달 좌상단 라운딩 처리
+          topRight: Radius.circular(16), // 모달 우상단 라운딩 처리
         ),
       ),
-      child: sessions.isEmpty
+      child: filteredSessions.isEmpty
           ? const Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  '로딩 중이다 인간!',
+                  '세션이 없어요ㅠㅠ',
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: 15,
@@ -254,6 +261,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
                       final_time: filteredSessions[index]["finaltime"],
                       create_time: DateTime.parse(
                           filteredSessions[index]["create_time"]),
+                      membernum: filteredSessions[index]["membernum"],
                     );
                   } else {
                     return const SizedBox(

@@ -6,6 +6,7 @@ import 'package:prototype_2/screen/loginscreen.dart';
 
 // import 'screen/homescreen.dart';
 
+
 void main() {
   runApp(
     MultiProvider(
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: const LoginScreen(),
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
       ),

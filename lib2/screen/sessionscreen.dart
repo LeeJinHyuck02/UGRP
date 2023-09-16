@@ -8,6 +8,7 @@ import 'package:prototype_2/assets/provider.dart';
 
 import 'homescreen.dart';
 import 'location.dart';
+import 'package:prototype_2/add/add1.dart';
 
 class SessionScreen extends StatefulWidget {
   final String input;
@@ -44,8 +45,6 @@ class SessionScreenstate extends State<SessionScreen> {
   }
 
   bool searching(List ssesions, List mmenu, String key) {
-    int a = 0;
-
     List result = [];
 
     if (key.isEmpty) {
@@ -59,7 +58,6 @@ class SessionScreenstate extends State<SessionScreen> {
               .contains(key.toLowerCase()) ||
           search(mmenu, ssesions[i]["name"], key)) {
         result.add(ssesions[i]);
-        a++;
       }
     }
 
@@ -170,6 +168,20 @@ class SessionScreenstate extends State<SessionScreen> {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: secondColor,
+        elevation: 15,
+        child: Icon(Icons.add, color: Colors.white),
+        heroTag: null,
+        onPressed: () {
+          Navigator.of(context).push(
+            SwipeablePageRoute(
+              canOnlySwipeFromEdge: true,
+              builder: (BuildContext context) => const StoreScreen(),
+            ),
+          );
+        },
+      ),
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
@@ -269,6 +281,7 @@ class SessionScreenstate extends State<SessionScreen> {
                                     ["finaltime"],
                                 create_time: DateTime.parse(
                                     filteredSessions[index]["create_time"]),
+                                membernum: filteredSessions[index]["membernum"],
                               );
                             },
                           ),
