@@ -4,12 +4,24 @@ import 'package:provider/provider.dart';
 
 import 'package:prototype_2/assets/provider.dart';
 import 'package:prototype_2/assets/asset.dart';
+import 'package:prototype_2/assets/api.dart';
+
+import 'package:prototype_2/screen/homescreen.dart';
 
 class CheckScreen extends StatefulWidget {
   final List userorder;
   final String selectedgage;
+  final String category;
+  final int finalorder;
+  final int tip;
 
-  const CheckScreen({super.key, required this.userorder, required this.selectedgage});
+  const CheckScreen(
+      {super.key,
+      required this.userorder,
+      required this.selectedgage,
+      required this.category,
+      required this.finalorder,
+      required this.tip});
 
   @override
   State<CheckScreen> createState() => _CheckScreenState();
@@ -18,6 +30,8 @@ class CheckScreen extends StatefulWidget {
 class _CheckScreenState extends State<CheckScreen> {
   Duration _duration = const Duration();
   String currentlocation = '체인지업 그라운드';
+  String userid = '';
+  int locationid = 1;
 
   var deliveryprice = 5000;
   double totalOrderPrice = 0;
@@ -25,8 +39,9 @@ class _CheckScreenState extends State<CheckScreen> {
   @override
   void initState() {
     super.initState();
-    for(int i = 0; i < widget.userorder.length ~/ 2; i++) {
-      totalOrderPrice += widget.userorder[2 * i]['price'] * widget.userorder[2 * i + 1]; 
+    for (int i = 0; i < widget.userorder.length ~/ 2; i++) {
+      totalOrderPrice +=
+          widget.userorder[2 * i]['price'] * widget.userorder[2 * i + 1];
     } // initState 내에서 계산
   }
 
@@ -40,9 +55,10 @@ class _CheckScreenState extends State<CheckScreen> {
     String formattedMinutes = minutes.toString().padLeft(2, '0');
     String formattedSeconds = seconds.toString().padLeft(2, '0');
     currentlocation = context.watch<UserProvider>().location;
+    locationid = context.watch<UserProvider>().locationid;
+    userid = context.watch<UserProvider>().userid;
     return Scaffold(
       backgroundColor: Colors.white,
-      
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
@@ -54,7 +70,6 @@ class _CheckScreenState extends State<CheckScreen> {
           style: TextStyle(color: Colors.black),
         ),
       ),
-
       floatingActionButton: SizedBox(
         width: MediaQuery.of(context).size.width - 40,
         height: 45,
@@ -64,7 +79,23 @@ class _CheckScreenState extends State<CheckScreen> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           onPressed: () {
-            // 주문을 처리하는 로직 추가
+            addsession(
+                userid,
+                widget.userorder,
+                widget.selectedgage,
+                widget.category,
+                totalOrderPrice.round(),
+                widget.finalorder,
+                minutes,
+                locationid,
+                widget.tip);
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const HomeScreen(),
+              ),
+              (route) => false,
+            );
           },
           icon: const Icon(
             Icons.shopping_cart,
@@ -83,7 +114,6 @@ class _CheckScreenState extends State<CheckScreen> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -130,7 +160,7 @@ class _CheckScreenState extends State<CheckScreen> {
                           ),
                         ],
                       ),
-                      Text('배달팁 $deliveryprice')
+                      Text('배달팁 ${widget.tip}')
                     ],
                   ),
                 ),
@@ -156,7 +186,9 @@ class _CheckScreenState extends State<CheckScreen> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           const Icon(Icons.food_bank_outlined),
-                          const SizedBox(width: 5,),
+                          const SizedBox(
+                            width: 5,
+                          ),
                           Text(widget.selectedgage),
                         ],
                       ),
@@ -298,7 +330,7 @@ class _CheckScreenState extends State<CheckScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('배달팁 '),
-                  Text('$deliveryprice원'),
+                  Text('${widget.tip}원'),
                 ],
               ),
               const Divider(
@@ -315,7 +347,7 @@ class _CheckScreenState extends State<CheckScreen> {
                     style: TextStyle(fontWeight: FontWeight.w600),
                   ),
                   Text(
-                    '${totalOrderPrice.round() + deliveryprice}원',
+                    '${totalOrderPrice.round() + widget.tip}원',
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ],

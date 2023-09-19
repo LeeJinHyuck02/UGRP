@@ -38,8 +38,11 @@ Future<List> loadmenu(String name) async {
     "name": name,
   };
 
-  var response = await http.post(Uri.parse("$server/sessions/orderload"),
-      headers: {"Content-Type": "application/json"}, body: jsonEncode(reqbody));
+  var response = await http.post(
+    Uri.parse("$server/sessions/orderload"),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(reqbody),
+  );
 
   List<dynamic> jsonResponse = json.decode(response.body);
 
@@ -65,21 +68,55 @@ Future<List> loadspots() async {
   return jsonResponse;
 }
 
-void addsession (String userid, List userorder, String selectedgage, String category, int currentorder, int finalorder, int finaltime, int location_id) async{
-    var reqbody = {
-      "userid": userid,
-      "userorder": jsonEncode(userorder),
-      "name": selectedgage,
-      "category": category,
-      "currentorder": currentorder,
-      "finalorder": finalorder,
-      "finaltime": finaltime,
-      "location_id": location_id,
-    };
+void addsession(
+    String userid,
+    List userorder,
+    String selectedgage,
+    String category,
+    int currentorder,
+    int finalorder,
+    int finaltime,
+    int location_id,
+    int tip) async {
+  var reqbody = {
+    "userid": userid,
+    "userorder": jsonEncode(userorder),
+    "name": selectedgage,
+    "category": category,
+    "currentorder": currentorder,
+    "finalorder": finalorder,
+    "finaltime": finaltime,
+    "location_id": location_id,
+    "tip": tip,
+  };
 
-    var response = await http.post(
-      Uri.parse("http://192.168.123.182:3000/sessions/add"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(reqbody),
-    );
+  var response = await http.post(
+    Uri.parse("$server/sessions/add"),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(reqbody),
+  );
+}
+
+Future<List> loadmysession(String userid) async {
+  List a = [];
+
+  var reqbody = {
+    "userid": userid,
+  };
+
+  var response = await http.post(
+    Uri.parse("$server/sessions/check"),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(reqbody),
+  );
+
+  var jsonResponse = jsonDecode(response.body);
+
+  if (jsonResponse == false) {
+    return a;
+  } else {
+    List<dynamic> result = jsonDecode(response.body);
+
+    return result;
   }
+}

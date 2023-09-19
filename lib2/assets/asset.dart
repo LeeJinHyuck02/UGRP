@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 
-import 'provider.dart';
+import 'package:prototype_2/assets/provider.dart';
+// import 'package:prototype_2/assets/api.dart';
 
 Color primaryColor = const Color.fromARGB(200, 200, 1, 80);
 Color secondColor = const Color.fromARGB(240, 102, 102, 92);
@@ -17,7 +18,8 @@ class _Session {
   int final_time;
   DateTime create_time;
 
-  _Session(this.store_name, this.create_time, this.current_order, this.fianl_order, this.final_time, this.location_id);
+  _Session(this.store_name, this.create_time, this.current_order,
+      this.fianl_order, this.final_time, this.location_id);
 }
 
 class session_info extends StatefulWidget {
@@ -227,7 +229,6 @@ class _TimerScreenState extends State<TimerScreen> {
     );
   }
 }
-
 
 class MapStyle {
   final String aubergine = """

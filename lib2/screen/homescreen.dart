@@ -4,6 +4,7 @@ import 'package:swipeable_page_route/swipeable_page_route.dart';
 
 import '../assets/asset.dart';
 import '../assets/provider.dart';
+import 'package:prototype_2/assets/api.dart';
 
 import 'package:prototype_2/screen/mapscreen.dart';
 import 'package:prototype_2/screen/sessionscreen.dart';
@@ -22,16 +23,23 @@ class HomeScreenState extends State<HomeScreen> {
   TextEditingController searchController = TextEditingController(text: '');
   PageController pageController = PageController(initialPage: 0);
   int currentpage = 0;
+  String userid = '';
 
   List pages = ['a', 'b', 'c']; // TODO: 위젯 리스트로 교체
 
   double pagewidth = 300;
   double pageheight = 170;
 
+  List sessions = [];
+
   @override
   Widget build(BuildContext context) {
     currentlocation = context.watch<UserProvider>().location;
+    userid = context.watch<UserProvider>().userid;
     pagewidth = MediaQuery.of(context).size.width - 30;
+
+    context.read<UserProvider>().inupdate(userid);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -161,6 +169,39 @@ class HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 16),
+              FutureBuilder(
+                future: loadmysession(context.watch<UserProvider>().userid),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (!snapshot.hasData) {
+                    return const SizedBox(
+                        height: 0,
+                      );
+                  } else {
+                    List a = snapshot.data as List;
+                    if (a.isEmpty) {
+                      return const SizedBox(
+                        height: 0,
+                      );
+                    } else {
+                      return Column(
+                        children: [
+                          session_info(
+                            store_name: snapshot.data?[0]["name"],
+                            location_id: snapshot.data?[0]["location_id"],
+                            current_order: snapshot.data?[0]["currentorder"],
+                            fianl_order: snapshot.data?[0]["finalorder"],
+                            final_time: snapshot.data?[0]["finaltime"],
+                            create_time:
+                                DateTime.parse(snapshot.data?[0]["create_time"]),
+                            membernum: snapshot.data?[0]["membernum"],
+                          ),
+                          Text('${snapshot.data[0]["userorder"]}'),
+                        ],
+                      );
+                    }
+                  }
+                },
+              ),
               Container(
                 // 이미지나 추천 세션 보여주는 container
                 height: pageheight,

@@ -6,18 +6,24 @@ import 'package:prototype_2/assets/asset.dart';
 import 'package:prototype_2/assets/provider.dart';
 
 import 'package:prototype_2/screen/homescreen.dart';
+import 'package:prototype_2/screen/location.dart';
 
 import 'package:prototype_2/add/add3.dart';
-
-class MyData {
-  static final List<String> items = ['섹션1', '섹션2', '섹션3', '섹션4', '세션5'];
-}
 
 class MenuScreen extends StatefulWidget {
   final String selectedgage;
   final List menu;
+  final String category;
+  final int finalorder;
+  final int tip;
 
-  MenuScreen({super.key, required this.selectedgage, required this.menu});
+  MenuScreen(
+      {super.key,
+      required this.selectedgage,
+      required this.menu,
+      required this.category,
+      required this.finalorder,
+      required this.tip});
 
   @override
   _MenuScreenState createState() => _MenuScreenState();
@@ -83,7 +89,15 @@ class _MenuScreenState extends State<MenuScreen> {
                           size: 23,
                         ),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                             Navigator.of(context).push(
+                              SwipeablePageRoute(
+                                canOnlySwipeFromEdge: true,
+                                builder: (BuildContext context) =>
+                                    const selectlocation(),
+                              ),
+                            );
+                          },
                           child: Text(
                             currentlocation,
                             style: TextStyle(
@@ -322,6 +336,9 @@ class _MenuScreenState extends State<MenuScreen> {
                     builder: (BuildContext context) => CheckScreen(
                       userorder: userorder,
                       selectedgage: widget.selectedgage,
+                      category: widget.category,
+                      finalorder: widget.finalorder,
+                      tip: widget.tip
                     ),
                   ),
                 );

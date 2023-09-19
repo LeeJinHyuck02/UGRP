@@ -45,7 +45,7 @@ class UserProvider extends ChangeNotifier {
       body: jsonEncode(reqbody)
     );
 
-    if (response.body == "true") {
+    if (response.body != "false") {
       _insession = true;
       notifyListeners();
     }

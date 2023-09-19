@@ -162,6 +162,7 @@ class LoginScreenState extends State<LoginScreen> {
                                 child: ElevatedButton(
                                   onPressed: () {
                                     login(userid.text, password.text);
+                                    context.read<UserProvider>().idupdate(userid.text);
                                     context.read<Menu>().menuupdate();
                                     context.read<Spots>().spotsupdate();
                                   },

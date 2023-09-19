@@ -8,6 +8,7 @@ import 'package:prototype_2/assets/asset.dart';
 import 'package:prototype_2/assets/provider.dart';
 
 import 'package:prototype_2/screen/homescreen.dart';
+import 'package:prototype_2/screen/location.dart';
 import 'package:prototype_2/add/add2.dart';
 
 class StoreScreen extends StatefulWidget {
@@ -88,7 +89,15 @@ class _StoreScreenState extends State<StoreScreen> {
                           size: 23,
                         ),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              SwipeablePageRoute(
+                                canOnlySwipeFromEdge: true,
+                                builder: (BuildContext context) =>
+                                    const selectlocation(),
+                              ),
+                            );
+                          },
                           child: Text(
                             currentlocation,
                             style: TextStyle(
@@ -275,12 +284,14 @@ class _StoreScreenState extends State<StoreScreen> {
                       child: Card(
                         color: Colors.white,
                         shape: RoundedRectangleBorder(
-                            side: BorderSide(
-                              color: secondColor,
-                              width: 2,
-                            ),
-                            borderRadius: const BorderRadius.all(
-                                Radius.elliptical(20, 20))),
+                          side: BorderSide(
+                            color: secondColor,
+                            width: 2,
+                          ),
+                          borderRadius: const BorderRadius.all(
+                            Radius.elliptical(20, 20),
+                          ),
+                        ),
                         child: ListTile(
                           tileColor: Colors.white,
                           title: SizedBox(
@@ -300,7 +311,12 @@ class _StoreScreenState extends State<StoreScreen> {
                               SwipeablePageRoute(
                                 canOnlySwipeFromEdge: true,
                                 builder: (BuildContext context) => MenuScreen(
-                                    selectedgage: selectedgage, menu: menu),
+                                  selectedgage: selectedgage,
+                                  menu: menu,
+                                  category: filteredstore[index]["category"],
+                                  finalorder: filteredstore[index]["finalorder"],
+                                  tip: filteredstore[index]["tip"]
+                                ),
                               ),
                             );
                           },

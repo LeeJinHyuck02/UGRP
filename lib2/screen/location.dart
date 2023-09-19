@@ -33,13 +33,7 @@ class _selectlocationState extends State<selectlocation> {
                     context
                         .read<UserProvider>()
                         .locationupdate(spots[index]["name"], spots[index]["id"]);
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const HomeScreen(),
-                      ),
-                      (route) => false,
-                    );
+                    Navigator.pop(context);
                   },
                   child: Container(
                     alignment: Alignment.centerLeft,
