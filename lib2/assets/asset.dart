@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:prototype_2/part/part1.dart';
 import 'package:provider/provider.dart';
+
+import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
+import 'package:swipeable_page_route/swipeable_page_route.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 import 'package:prototype_2/assets/provider.dart';
-// import 'package:prototype_2/assets/api.dart';
+import 'package:prototype_2/assets/api.dart';
 
 Color primaryColor = const Color.fromARGB(200, 200, 1, 80);
-Color secondColor = const Color.fromARGB(240, 102, 102, 92);
+Color secondColor = const Color.fromARGB(200, 200, 1, 80);
+
+// const Color.fromARGB(240, 102, 102, 92);
 
 String server = 'http://172.20.10.3:3000';
+String websocket = 'ws://172.20.10.3:3000';
 
 class _Session {
   String store_name;
@@ -22,7 +30,16 @@ class _Session {
       this.fianl_order, this.final_time, this.location_id);
 }
 
+class chat {
+  DateTime create_time;
+  String userid;
+  String message;
+
+  chat(this.create_time, this.userid, this.message);
+}
+
 class session_info extends StatefulWidget {
+  final int sessionid;
   final String store_name;
   final int location_id;
   final int current_order;
@@ -33,6 +50,7 @@ class session_info extends StatefulWidget {
 
   session_info(
       {super.key,
+      required this.sessionid,
       required this.store_name,
       required this.location_id,
       required this.current_order,
@@ -47,6 +65,7 @@ class session_info extends StatefulWidget {
 
 class _session_infoState extends State<session_info> {
   double infowidth = 170;
+  List menu = [];
 
   List<String> tags = ['이진혁 추천 맛집'];
   String location = '';
@@ -57,6 +76,26 @@ class _session_infoState extends State<session_info> {
     location =
         context.watch<Spots>().spots[widget.location_id - 1]["name"].toString();
     return GestureDetector(
+      onTap: () async {
+        menu = await loadmenu(widget.store_name);
+
+        Navigator.of(context).push(
+          SwipeablePageRoute(
+            canOnlySwipeFromEdge: true,
+            builder: (BuildContext context) => Part1(
+              sessionid: widget.sessionid,
+              store_name: widget.store_name,
+              location_id: widget.location_id,
+              current_order: widget.current_order,
+              fianl_order: widget.fianl_order,
+              final_time: widget.final_time,
+              create_time: widget.create_time,
+              membernum: widget.membernum,
+              menu: menu,
+            ),
+          ),
+        );
+      },
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -114,10 +153,10 @@ class _session_infoState extends State<session_info> {
                           SizedBox(
                             width: 200,
                             child: Text(
-                              widget.store_name,
+                              '#${widget.sessionid} ${widget.store_name}',
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                fontSize: 22,
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -210,8 +249,8 @@ class _TimerScreenState extends State<TimerScreen> {
     _initialduration = now.difference(widget.create_time).inSeconds;
     return Container(
       padding: const EdgeInsets.fromLTRB(0, 0, 12, 0),
-      height: 80,
-      width: 80,
+      height: 65,
+      width: 65,
       child: Center(
         child: CircularCountDownTimer(
           duration: _duration * 60,
@@ -226,6 +265,226 @@ class _TimerScreenState extends State<TimerScreen> {
           textFormat: CountdownTextFormat.MM_SS,
         ),
       ),
+    );
+  }
+}
+
+class Mysession extends StatefulWidget {
+  final int sessionid;
+  final String storename;
+  final int locationid;
+  final int currentorder;
+  final int fianlorder;
+  final int finaltime;
+  final DateTime createtime;
+  final int membernum;
+  final List userorder;
+
+  const Mysession(
+      {super.key,
+      required this.sessionid,
+      required this.storename,
+      required this.locationid,
+      required this.currentorder,
+      required this.fianlorder,
+      required this.finaltime,
+      required this.createtime,
+      required this.membernum,
+      required this.userorder});
+
+  @override
+  State<Mysession> createState() => _MysessionState();
+}
+
+class _MysessionState extends State<Mysession>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  DateTime now = DateTime.now();
+
+  int time = 15;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      duration: const Duration(minutes: 5, seconds: 10), // 여기서 시간을 조절.
+      vsync: this,
+    );
+
+    _animation = Tween<double>(begin: 1.0, end: 0.05).animate(_controller)
+      ..addListener(() {
+        setState(() {});
+      });
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    time = now.difference(widget.createtime).inSeconds; // 추후 작업 필요
+    String location =
+        context.watch<Spots>().spots[widget.locationid - 1]["name"].toString();
+    double width = MediaQuery.of(context).size.width - 30;
+    int minutes =
+        (((_controller.duration?.inSeconds ?? 0) * (1 - _controller.value))
+                    .round() /
+                60)
+            .floor();
+    int seconds =
+        ((_controller.duration?.inSeconds ?? 0) * (1 - _controller.value))
+                .round() %
+            60;
+    String formattedMinutes = minutes.toString().padLeft(2, '0');
+    String formattedSeconds = seconds.toString().padLeft(2, '0');
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: secondColor,
+          width: 1,
+        ),
+        borderRadius: const BorderRadius.horizontal(
+          left: Radius.circular(16),
+          right: Radius.circular(16),
+        ),
+      ),
+      width: width,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.gps_fixed,
+                  size: 18,
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  location,
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 6,
+            ),
+            Text(
+              widget.storename,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(
+              height: 6,
+            ),
+            SizedBox(
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: widget.userorder.length ~/ 2,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        top: BorderSide(width: 0.5, color: Colors.black),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 3),
+                        Text(
+                          '  메뉴:  ${widget.userorder[index * 2]["menu"]}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 4,
+                        ),
+                        Text(
+                          '  가격:  ${widget.userorder[index * 2]["price"] * widget.userorder[index * 2 + 1]}원',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: secondColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 8),
+            Stack(
+              children: [
+                LinearPercentIndicator(
+                  lineHeight: 27.0,
+                  width: width - 35,
+                  percent: _animation.value,
+                  barRadius: const Radius.circular(16),
+                  backgroundColor: Colors.white,
+                  progressColor: secondColor,
+                  center: Text(
+                    '$formattedMinutes 분 $formattedSeconds 초',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+                if (_animation.value <= 0.05) ...[
+                  const Positioned(
+                    left: 10, // 체크표시 아이콘의 위치를 조절합니다.
+                    top: 0,
+                    bottom: 0,
+                    child: Center(
+                      child: Icon(Icons.check, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Chatbubble extends StatelessWidget {
+  final String message;
+  final bool isEnd;
+  final bool isSender;
+
+  const Chatbubble({
+    super.key,
+    required this.message,
+    required this.isEnd,
+    required this.isSender,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BubbleSpecialThree(
+      text: message,
+      color: isSender ? primaryColor : Color.fromARGB(153, 190, 0, 76),
+      tail: isEnd,
+      isSender: isSender,
+      textStyle: const TextStyle(color: Colors.white, fontSize: 12),
     );
   }
 }

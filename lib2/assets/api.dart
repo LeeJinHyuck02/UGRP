@@ -33,6 +33,22 @@ Future<List> loadstore() async {
   return jsonResponse;
 }
 
+Future<List> loadastore(String name) async {
+  var reqbody = {
+    "name": name,
+  };
+
+  var response = await http.post(
+    Uri.parse("$server/sessions/astoreload"),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(reqbody),
+  );
+
+  List jsonResponse = json.decode(response.body);
+
+  return jsonResponse;
+}
+
 Future<List> loadmenu(String name) async {
   var reqbody = {
     "name": name,
@@ -112,11 +128,69 @@ Future<List> loadmysession(String userid) async {
 
   var jsonResponse = jsonDecode(response.body);
 
+  var response2 = await http.post(
+    Uri.parse("$server/sessions/loadmy"),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(reqbody),
+  );
+
   if (jsonResponse == false) {
     return a;
   } else {
-    List<dynamic> result = jsonDecode(response.body);
+    List<dynamic> result =
+        jsonDecode(response.body) + jsonDecode(response2.body);
 
     return result;
   }
+}
+
+void addmember(
+    String userid, int sessionid, int currentorder, List userorder) async {
+  var reqbody = {
+    "userid": userid,
+    "sessionid": sessionid,
+    "currentorder": currentorder,
+    "userorder": jsonEncode(userorder),
+  };
+
+  var response = await http.post(
+    Uri.parse("$server/sessions/addmember"),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(reqbody),
+  );
+}
+
+Stream<List> loadchat(int chatID) async* {
+  var reqbody = {
+    "chatID": chatID,
+  };
+
+  while (true) {
+    final response = await http.post(
+      Uri.parse("$server/community/loadchat"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(reqbody),
+    );
+
+    List<dynamic> result = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      yield result;
+    } // 네트워크 비정상 시 예외 처리
+    Future.delayed(Duration(seconds: 2));
+  }
+}
+
+void sendchat (String userid, String message, int chatID) async {
+   var reqbody = {
+    'userid' : userid,
+    'message': message,
+    'chatID': chatID,
+   };
+
+   var response = await http.post(
+    Uri.parse('$server/community/sendchat'),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(reqbody),
+   );
 }

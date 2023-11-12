@@ -1,38 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:prototype_2/part/part2.dart';
 import 'package:provider/provider.dart';
 import 'package:swipeable_page_route/swipeable_page_route.dart';
 
 import 'package:prototype_2/assets/asset.dart';
 import 'package:prototype_2/assets/provider.dart';
+import 'package:prototype_2/assets/api.dart';
 
 import 'package:prototype_2/screen/homescreen.dart';
 import 'package:prototype_2/screen/location.dart';
 
-import 'package:prototype_2/add/add3.dart';
-
-class MenuScreen extends StatefulWidget {
-  final String selectedgage;
+class Part1 extends StatefulWidget {
+  final int sessionid;
+  final String store_name;
+  final int location_id;
+  final int current_order;
+  final int fianl_order;
+  final int final_time;
+  final DateTime create_time;
+  final int membernum;
   final List menu;
-  final String category;
-  final int finalorder;
-  final int tip;
 
-  MenuScreen(
-      {super.key,
-      required this.selectedgage,
-      required this.menu,
-      required this.category,
-      required this.finalorder,
-      required this.tip});
+  const Part1({
+    super.key,
+    required this.sessionid,
+    required this.store_name,
+    required this.location_id,
+    required this.current_order,
+    required this.fianl_order,
+    required this.final_time,
+    required this.create_time,
+    required this.membernum,
+    required this.menu,
+  });
 
   @override
-  _MenuScreenState createState() => _MenuScreenState();
+  State<Part1> createState() => _Part1State();
 }
 
-class _MenuScreenState extends State<MenuScreen> {
-  List userorder = [];
-
+class _Part1State extends State<Part1> {
   String currentlocation = '체인지업 그라운드';
+  List userorder = [];
+  List store = [];
+
   var menunum = [];
 
   int calorder2() {
@@ -54,8 +64,6 @@ class _MenuScreenState extends State<MenuScreen> {
       }
     }
 
-    print(userorder);
-
     return a;
   }
 
@@ -69,6 +77,7 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     currentlocation = context.watch<UserProvider>().location;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
@@ -91,7 +100,7 @@ class _MenuScreenState extends State<MenuScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                             Navigator.of(context).push(
+                            Navigator.of(context).push(
                               SwipeablePageRoute(
                                 canOnlySwipeFromEdge: true,
                                 builder: (BuildContext context) =>
@@ -148,55 +157,18 @@ class _MenuScreenState extends State<MenuScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              child: Stack(
-                children: <Widget>[
-                  Container(
-                    width: double.infinity,
-                    height: 150,
-                    color: Colors.grey,
-                  ),
-                  Container(
-                    width: double.infinity,
-                    height: 75,
-                    color: Colors.white,
-                  ),
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 25),
-                        Card(
-                          elevation: 5,
-                          child: InkWell(
-                            child: SizedBox(
-                              width: 200,
-                              height: 100,
-                              child: Center(
-                                child: Text(
-                                  widget.selectedgage,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: Column(
-                      children: [
-                        Container(height: 100),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            session_info(
+              sessionid: widget.sessionid,
+              store_name: widget.store_name,
+              location_id: widget.location_id,
+              current_order: widget.current_order,
+              fianl_order: widget.fianl_order,
+              final_time: widget.final_time,
+              create_time: widget.create_time,
+              membernum: widget.membernum,
+            ),
+            const SizedBox(
+              height: 8,
             ),
             ListView.builder(
               shrinkWrap: true,
@@ -204,37 +176,48 @@ class _MenuScreenState extends State<MenuScreen> {
               itemCount: widget.menu.length,
               itemBuilder: (BuildContext context, int index) {
                 return SizedBox(
-                  height: 90, // width: 180,
+                  height: 80,
+                  width: 20,
                   child: Card(
                     color: Colors.white,
+                    surfaceTintColor: Colors.white,
                     elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        color: secondColor,
+                        width: 1,
+                      ),
+                      borderRadius: const BorderRadius.all(
+                        Radius.elliptical(20, 20),
+                      ),
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                                child: SizedBox(
-                                  child: Text(
-                                    widget.menu[index]['menu'],
-                                    style: TextStyle(
-                                      fontSize: 19,
-                                      fontWeight: FontWeight.bold,
-                                      color: secondColor,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                              child: SizedBox(
+                                child: Text(
+                                  widget.menu[index]['menu'],
+                                  style: TextStyle(
+                                    fontSize: 19,
+                                    color: secondColor,
                                   ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Row(
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            SizedBox(
+                              width: 150,
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -245,15 +228,14 @@ class _MenuScreenState extends State<MenuScreen> {
                                       '${widget.menu[index]['price']} 원',
                                       style: const TextStyle(
                                         fontSize: 17,
-                                        fontWeight: FontWeight.bold,
                                         color: Color.fromARGB(255, 75, 75, 75),
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                         Row(
                           children: [
@@ -261,21 +243,22 @@ class _MenuScreenState extends State<MenuScreen> {
                               width: 40,
                               height: 30,
                               child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                      backgroundColor: Colors.white),
-                                  onPressed: () {
-                                    if (menunum[index] == 0) {
-                                    } else {
-                                      setState(() {
-                                        menunum[index]--;
-                                      });
-                                    }
-                                  },
-                                  child: Icon(
-                                    Icons.remove,
-                                    color: secondColor,
-                                  )),
+                                style: ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    backgroundColor: Colors.white),
+                                onPressed: () {
+                                  if (menunum[index] == 9) {
+                                  } else {
+                                    setState(() {
+                                      menunum[index]++;
+                                    });
+                                  }
+                                },
+                                child: Icon(
+                                  Icons.add,
+                                  color: secondColor,
+                                ),
+                              ),
                             ),
                             const SizedBox(width: 17),
                             Text(
@@ -291,21 +274,22 @@ class _MenuScreenState extends State<MenuScreen> {
                               width: 40,
                               height: 30,
                               child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                      backgroundColor: Colors.white),
-                                  onPressed: () {
-                                    if (menunum[index] == 9) {
-                                    } else {
-                                      setState(() {
-                                        menunum[index]++;
-                                      });
-                                    }
-                                  },
-                                  child: Icon(
-                                    Icons.add,
-                                    color: secondColor,
-                                  )),
+                                style: ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    backgroundColor: Colors.white),
+                                onPressed: () {
+                                  if (menunum[index] == 0) {
+                                  } else {
+                                    setState(() {
+                                      menunum[index]--;
+                                    });
+                                  }
+                                },
+                                child: Icon(
+                                  Icons.remove,
+                                  color: secondColor,
+                                ),
+                              ),
                             ),
                             const SizedBox(width: 12),
                           ],
@@ -322,17 +306,21 @@ class _MenuScreenState extends State<MenuScreen> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.zero, backgroundColor: secondColor),
-              onPressed: () {
+              onPressed: () async {
                 int cal = calorder2();
+
+                store = await loadastore(widget.store_name);
+
                 Navigator.of(context).push(
                   SwipeablePageRoute(
                     canOnlySwipeFromEdge: true,
-                    builder: (BuildContext context) => CheckScreen(
+                    builder: (BuildContext context) => Part2(
                       userorder: userorder,
-                      selectedgage: widget.selectedgage,
-                      category: widget.category,
-                      finalorder: widget.finalorder,
-                      tip: widget.tip
+                      selectedgage: widget.store_name,
+                      sessionid: widget.sessionid,
+                      category: store[0]["category"],
+                      finalorder: widget.fianl_order,
+                      tip: store[0]["tip"],
                     ),
                   ),
                 );

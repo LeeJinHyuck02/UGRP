@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:prototype_2/assets/provider.dart';
 import 'package:prototype_2/screen/loginscreen.dart';
 
-// import 'screen/homescreen.dart';
+import 'package:prototype_2/community/chat.dart';
 
 
 void main() {
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const LoginScreen(),
+      home: Chatscreen(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,

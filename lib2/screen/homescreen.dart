@@ -18,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  String currentlocation = '체인지업 그라운드'; // TODO: provider로 교체
+  String currentlocation = '체인지업 그라운드'; // 
 
   TextEditingController searchController = TextEditingController(text: '');
   PageController pageController = PageController(initialPage: 0);
@@ -170,7 +170,7 @@ class HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 16),
               FutureBuilder(
-                future: loadmysession(context.watch<UserProvider>().userid),
+                future: loadmysession(userid),
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (!snapshot.hasData) {
                     return const SizedBox(
@@ -185,23 +185,25 @@ class HomeScreenState extends State<HomeScreen> {
                     } else {
                       return Column(
                         children: [
-                          session_info(
-                            store_name: snapshot.data?[0]["name"],
-                            location_id: snapshot.data?[0]["location_id"],
-                            current_order: snapshot.data?[0]["currentorder"],
-                            fianl_order: snapshot.data?[0]["finalorder"],
-                            final_time: snapshot.data?[0]["finaltime"],
-                            create_time:
+                          Mysession(
+                            sessionid: snapshot.data?[0]["id"],
+                            storename: snapshot.data?[0]["name"],
+                            locationid: snapshot.data?[0]["location_id"],
+                            currentorder: snapshot.data?[0]["currentorder"],
+                            fianlorder: snapshot.data?[0]["finalorder"],
+                            finaltime: snapshot.data?[0]["finaltime"],
+                            createtime:
                                 DateTime.parse(snapshot.data?[0]["create_time"]),
                             membernum: snapshot.data?[0]["membernum"],
-                          ),
-                          Text('${snapshot.data[0]["userorder"]}'),
+                            userorder: snapshot.data[1]["userorder"]
+                          )
                         ],
                       );
                     }
                   }
                 },
               ),
+              const SizedBox(height: 16),
               Container(
                 // 이미지나 추천 세션 보여주는 container
                 height: pageheight,

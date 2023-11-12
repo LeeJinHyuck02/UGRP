@@ -71,7 +71,7 @@ class SessionScreenstate extends State<SessionScreen> {
   }
 
   void waitforsessions() async {
-    sessions = await loadsessions('qqqq');
+    sessions = await loadsessions('qqqq'); // TODO: userid 변경
     filteredSessions = sessions;
     setState(() {});
   }
@@ -270,6 +270,7 @@ class SessionScreenstate extends State<SessionScreen> {
                             itemCount: filteredSessions.length,
                             itemBuilder: (BuildContext context, int index) {
                               return session_info(
+                                sessionid: filteredSessions[index]["id"],
                                 store_name: filteredSessions[index]["name"],
                                 location_id: filteredSessions[index]
                                     ["location_id"],

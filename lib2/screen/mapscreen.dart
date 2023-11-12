@@ -254,6 +254,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
                   if (filteredSessions[index]["location_id"] ==
                       widget.location_id) {
                     return session_info(
+                      sessionid: filteredSessions[index]["id"],
                       store_name: filteredSessions[index]["name"],
                       location_id: filteredSessions[index]["location_id"],
                       current_order: filteredSessions[index]["currentorder"],
