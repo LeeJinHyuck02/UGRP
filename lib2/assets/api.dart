@@ -160,7 +160,7 @@ void addmember(
   );
 }
 
-Stream<List> loadchat(int chatID) async* {
+Future<List> loadbeforechat(int chatID) async {
   var reqbody = {
     "chatID": chatID,
   };
@@ -175,22 +175,98 @@ Stream<List> loadchat(int chatID) async* {
     List<dynamic> result = json.decode(response.body);
 
     if (response.statusCode == 200) {
-      yield result;
-    } // 네트워크 비정상 시 예외 처리
-    Future.delayed(Duration(seconds: 2));
+      return result;
+    }
   }
 }
 
-void sendchat (String userid, String message, int chatID) async {
-   var reqbody = {
-    'userid' : userid,
+void sendchat(String userid, String message, int chatID) async {
+  var reqbody = {
+    'userid': userid,
     'message': message,
     'chatID': chatID,
-   };
+  };
 
-   var response = await http.post(
+  var response = await http.post(
     Uri.parse('$server/community/sendchat'),
     headers: {"Content-Type": "application/json"},
     body: jsonEncode(reqbody),
-   );
+  );
+}
+
+Future<List> loadrooms() async {
+  var reqbody = {};
+
+  var response = await http.post(
+    Uri.parse("$server/community/loadrooms"),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(reqbody),
+  );
+
+  List<dynamic> jsonResponse = json.decode(response.body);
+
+  return jsonResponse;
+}
+
+void addtexts(
+  String userid,
+  String title,
+  String usertext,
+) async {
+  var reqbody = {
+    "userid": userid,
+    "title": title,
+    "usertext": usertext,
+  };
+
+  var response = await http.post(
+    Uri.parse("$server/community/addtext"),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(reqbody),
+  );
+}
+
+void addcomments(
+  int id,
+  String userid,
+  String usertext,
+) async {
+  var reqbody = {
+    "textid": id,
+    "userid": userid,
+    "usertext": usertext,
+  };
+
+  var response = await http.post(
+    Uri.parse("$server/community/add"),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(reqbody),
+  );
+}
+
+Future<List> loadboard(String name) async {
+  var reqbody = {
+    "name": name,
+  };
+
+  var response = await http.post(Uri.parse("$server/community/board"),
+      headers: {"Content-Type": "application/json"}, body: jsonEncode(reqbody));
+
+  List<dynamic> jsonResponse = json.decode(response.body);
+
+  return jsonResponse;
+}
+
+
+Future<List> loadcomment(int id) async {
+  var reqbody = {
+    "textid": id,
+  };
+
+  var response = await http.post(Uri.parse("$server/community/comment"),
+      headers: {"Content-Type": "application/json"}, body: jsonEncode(reqbody));
+
+  List<dynamic> jsonResponse = json.decode(response.body);
+
+  return jsonResponse;
 }

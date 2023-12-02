@@ -4,20 +4,23 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:swipeable_page_route/swipeable_page_route.dart';
-import 'package:web_socket_channel/io.dart';
+// import 'package:web_socket_channel/io.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-import '../assets/asset.dart';
-import '../assets/provider.dart';
+import 'package:prototype_2/assets/asset.dart';
+import 'package:prototype_2/assets/provider.dart';
 import 'package:prototype_2/assets/api.dart';
 
 import 'package:prototype_2/screen/location.dart';
 import 'package:prototype_2/screen/homescreen.dart';
 
-import 'package:prototype_2/screen/loginscreen.dart';
+// import 'package:prototype_2/screen/loginscreen.dart';
 
 class Chatscreen extends StatefulWidget {
-  const Chatscreen({super.key});
+  final int chatid;
+  final String name;
+
+  const Chatscreen({super.key, required this.chatid, required this.name});
 
   @override
   State<Chatscreen> createState() => _ChatscreenState();
@@ -31,7 +34,7 @@ class _ChatscreenState extends State<Chatscreen> {
 
   var userInput;
 
-  List<String> message = [];
+  List message = [];
   int a = 0;
 
   // final IOWebSocketChannel channel = IOWebSocketChannel.connect('ws://172.20.10.3:3000');
@@ -51,9 +54,16 @@ class _ChatscreenState extends State<Chatscreen> {
     }
   }
 
+  void waitforchat() async {
+    message = await loadbeforechat(widget.chatid);
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
+
+    waitforchat();
 
     socket = IO.io(server, <String, dynamic>{
       "transports": ["websocket"],
@@ -69,9 +79,8 @@ class _ChatscreenState extends State<Chatscreen> {
     socket!.emit('join', jsonEncode(body));
 
     socket!.on('get', (data) {
-      message.add(data);
-
-      print(message);
+      Map<String,dynamic> jsonData = jsonDecode(data);
+      message.add(jsonData);
     });
   }
 
@@ -94,6 +103,7 @@ class _ChatscreenState extends State<Chatscreen> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.white, // body 위에 hover할 때의 색깔 지정
           title: Padding(
@@ -154,13 +164,7 @@ class _ChatscreenState extends State<Chatscreen> {
                         ),
                         IconButton(
                           onPressed: () {
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const LoginScreen(),
-                              ),
-                              (route) => false,
-                            );
+                            
                           },
                           icon: Icon(
                             Icons.menu,
@@ -183,27 +187,62 @@ class _ChatscreenState extends State<Chatscreen> {
               // message.add(snapshot.data);
 
               StreamBuilder(
-                  stream: loadchat(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return SizedBox(
-                        height: MediaQuery.of(context).size.height - 150,
-                        child: ListView.builder(
-                          itemCount: snapshot.data!.length,
-                          reverse: true,
-                          itemBuilder: (context, index) {
-                            return Text(snapshot.data![index]);
-                          },
-                        ),
-                      );
-                    }
-                    else {
-                      return SizedBox(
-                        height: MediaQuery.of(context).size.height - 150,
-                        child: const Center(child: Text('조용합니다...')),
-                      );
-                    }
-                  }),
+                stream: loadchat(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    List data = snapshot.data!;
+                    data = data.reversed.toList();
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height - 150,
+                      child: ListView.builder(
+                        reverse: true,
+                        itemCount: data!.length,
+                        itemBuilder: (context, index) {
+                          return Column(
+                            children: [
+                              (index == data.length - 1) ||
+                                      !(data[index]["userid"] ==
+                                          data[index + 1]["userid"])
+                                  ? Row(
+                                      mainAxisAlignment:
+                                          userid == data[index]["userid"]
+                                              ? MainAxisAlignment.end
+                                              : MainAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(width: 20),
+                                        Text(
+                                          data[index]["userid"],
+                                          style: const TextStyle(fontSize: 13),
+                                        ),
+                                        const SizedBox(width: 20),
+                                      ],
+                                    )
+                                  : const SizedBox(
+                                      height: 0,
+                                    ),
+                              Chatbubble(
+                                isEnd: (index == 0) ||
+                                    !(data[index]["userid"] ==
+                                        data[index - 1]["userid"]),
+                                message: data[index]["message"],
+                                isSender: userid == data[index]["userid"],
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    );
+                  } else {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height - 170,
+                      child: Center(
+                        child: CircularProgressIndicator(color: primaryColor),
+                      ),
+                    );
+                  }
+                },
+              ),
+              
 
               const SizedBox(
                 height: 8,
@@ -314,5 +353,26 @@ StreamBuilder(
                 },
               ),
               
-              
+              StreamBuilder(
+                stream: loadchat(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height - 150,
+                      child: ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        reverse: true,
+                        itemBuilder: (context, index) {
+                          return Text(snapshot.data![index]);
+                        },
+                      ),
+                    );
+                  } else {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height - 150,
+                      child: const Center(child: Text('조용합니다...')),
+                    );
+                  }
+                },
+              ),
 */

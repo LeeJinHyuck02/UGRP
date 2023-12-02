@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:swipeable_page_route/swipeable_page_route.dart';
 
-import '../assets/asset.dart';
-import '../assets/provider.dart';
+import 'package:prototype_2/assets/asset.dart';
+import 'package:prototype_2/assets/provider.dart';
 import 'package:prototype_2/assets/api.dart';
+
+import 'package:prototype_2/community/board.dart';
+import 'package:prototype_2/community/chatrooms.dart';
 
 import 'package:prototype_2/screen/mapscreen.dart';
 import 'package:prototype_2/screen/sessionscreen.dart';
@@ -18,7 +21,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  String currentlocation = '체인지업 그라운드'; // 
+  String currentlocation = '체인지업 그라운드'; //
 
   TextEditingController searchController = TextEditingController(text: '');
   PageController pageController = PageController(initialPage: 0);
@@ -174,8 +177,8 @@ class HomeScreenState extends State<HomeScreen> {
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (!snapshot.hasData) {
                     return const SizedBox(
-                        height: 0,
-                      );
+                      height: 0,
+                    );
                   } else {
                     List a = snapshot.data as List;
                     if (a.isEmpty) {
@@ -186,17 +189,16 @@ class HomeScreenState extends State<HomeScreen> {
                       return Column(
                         children: [
                           Mysession(
-                            sessionid: snapshot.data?[0]["id"],
-                            storename: snapshot.data?[0]["name"],
-                            locationid: snapshot.data?[0]["location_id"],
-                            currentorder: snapshot.data?[0]["currentorder"],
-                            fianlorder: snapshot.data?[0]["finalorder"],
-                            finaltime: snapshot.data?[0]["finaltime"],
-                            createtime:
-                                DateTime.parse(snapshot.data?[0]["create_time"]),
-                            membernum: snapshot.data?[0]["membernum"],
-                            userorder: snapshot.data[1]["userorder"]
-                          )
+                              sessionid: snapshot.data?[0]["id"],
+                              storename: snapshot.data?[0]["name"],
+                              locationid: snapshot.data?[0]["location_id"],
+                              currentorder: snapshot.data?[0]["currentorder"],
+                              fianlorder: snapshot.data?[0]["finalorder"],
+                              finaltime: snapshot.data?[0]["finaltime"],
+                              createtime: DateTime.parse(
+                                  snapshot.data?[0]["create_time"]),
+                              membernum: snapshot.data?[0]["membernum"],
+                              userorder: snapshot.data[1]["userorder"])
                         ],
                       );
                     }
@@ -344,8 +346,51 @@ class HomeScreenState extends State<HomeScreen> {
                     right: Radius.circular(30),
                   ),
                 ),
-                child: const Column(
-                  children: [],
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                SwipeablePageRoute(
+                                  canOnlySwipeFromEdge: true,
+                                  builder: (BuildContext context) =>
+                                      const Chatrooms(),
+                                ),
+                              );
+                            },
+                            child: SizedBox(
+                              width: 50,
+                              height: 50,
+                              child:
+                                  Icon(Icons.chat_outlined, color: primaryColor, size: 40),
+                            ),
+                          ),
+                          const SizedBox(width: 15,),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                SwipeablePageRoute(
+                                  canOnlySwipeFromEdge: true,
+                                  builder: (BuildContext context) =>
+                                      Board(),
+                                ),
+                              );
+                            },
+                            child: SizedBox(
+                              width: 50,
+                              height: 50,
+                              child:
+                                  Icon(Icons.content_paste, color: primaryColor, size: 40),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(

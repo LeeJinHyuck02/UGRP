@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:prototype_2/community/board.dart';
 import 'package:provider/provider.dart';
 
 import 'package:prototype_2/assets/provider.dart';
 import 'package:prototype_2/screen/loginscreen.dart';
 
-import 'package:prototype_2/community/chat.dart';
+import 'package:prototype_2/community/chatrooms.dart';
 
 
 void main() {
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Chatscreen(),
+      home: const LoginScreen(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,

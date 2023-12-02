@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:prototype_2/part/part1.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+
+import 'package:prototype_2/part/part1.dart';
 
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
@@ -488,6 +490,152 @@ class Chatbubble extends StatelessWidget {
     );
   }
 }
+
+class Boarddetail extends StatefulWidget {
+  final int board_id;
+  final String board_title;
+  final String board_text;
+  final String board_name;
+  final DateTime create_time;
+  final String userid;
+
+  const Boarddetail(
+      {super.key,
+      required this.board_id,
+      required this.board_title,
+      required this.board_text,
+      required this.board_name,
+      required this.create_time,
+      required this.userid});
+
+  @override
+  State<Boarddetail> createState() => _BoarddetailState();
+}
+
+class _BoarddetailState extends State<Boarddetail> {
+  final TextEditingController _commentController = TextEditingController();
+  List comments = [];
+
+  void waitforcomments() async {
+    comments = await loadcomment(widget.board_id);
+    setState(() {});
+  } 
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+  
+  @override
+  void initState() {
+    waitforcomments();
+    super.initState();
+  }
+
+  String formatDateTime(DateTime dateTime) {
+    final DateFormat formatter = DateFormat('MM/dd HH:mm');
+    return formatter.format(dateTime);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: const Text(
+          "게시판",
+          style: TextStyle(color: Colors.black),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.person_2_rounded),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(widget.board_name),
+                      Text(formatDateTime(widget.create_time)),
+                    ],
+                  )
+                ],
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              Text(
+                widget.board_title,
+                style:
+                    const TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(
+                height: 30,
+              ),
+              Text(
+                widget.board_text,
+                style: const TextStyle(fontSize: 20),
+              ),
+              const SizedBox(height: 40),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: comments.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    elevation: 0,
+                    color: Colors.grey.shade100,
+                    child: Container(
+                      width: 50,
+                      constraints: const BoxConstraints(
+                        maxHeight: 100, // Maximum height
+                        minHeight: 50, // Minimum height
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(comments[index]["usertext"]), // Display each comment
+                      ),
+                    ),
+                  );
+                },
+              ),
+              TextField(
+                controller: _commentController,
+                decoration: InputDecoration(
+                  labelText: '댓글을 입력하세요!',
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.send),
+                    onPressed: () {
+                      addcomments(widget.board_id, 'qqqq', _commentController.text);
+                      waitforcomments();
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      _commentController.text = '';
+                      setState(() {
+                        
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 
 class MapStyle {
   final String aubergine = """
