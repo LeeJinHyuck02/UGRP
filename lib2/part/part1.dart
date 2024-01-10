@@ -170,135 +170,132 @@ class _Part1State extends State<Part1> {
             const SizedBox(
               height: 8,
             ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: widget.menu.length,
-              itemBuilder: (BuildContext context, int index) {
-                return SizedBox(
-                  height: 80,
-                  width: 20,
-                  child: Card(
-                    color: Colors.white,
-                    surfaceTintColor: Colors.white,
-                    elevation: 5,
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                        color: secondColor,
-                        width: 1,
-                      ),
-                      borderRadius: const BorderRadius.all(
-                        Radius.elliptical(20, 20),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                              child: SizedBox(
-                                child: Text(
-                                  widget.menu[index]['menu'],
-                                  style: TextStyle(
-                                    fontSize: 19,
-                                    color: secondColor,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(15, 0 , 15, 0),
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: widget.menu.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return SizedBox(
+                    height: 80,
+                    width: 20,
+                    child: Card(
+                      color: Colors.white,
+                      surfaceTintColor: Colors.white,
+                      elevation: 0.7,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width - 200,
+                                  child: Text(
+                                    widget.menu[index]['menu'],
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            SizedBox(
-                              width: 150,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(12, 0, 0, 0),
-                                    child: Text(
-                                      '${widget.menu[index]['price']} 원',
-                                      style: const TextStyle(
-                                        fontSize: 17,
-                                        color: Color.fromARGB(255, 75, 75, 75),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              SizedBox(
+                                width: 150,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(12, 0, 0, 0),
+                                      child: Text(
+                                        '${widget.menu[index]['price']} 원',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color.fromARGB(255, 75, 75, 75),
+                                        ),
                                       ),
                                     ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 40,
+                                height: 30,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      backgroundColor: Colors.white),
+                                  onPressed: () {
+                                    if (menunum[index] == 0) {
+                                    } else {
+                                      setState(() {
+                                        menunum[index]--;
+                                      });
+                                    }
+                                  },
+                                  child: Icon(
+                                    Icons.remove,
+                                    color: secondColor,
                                   ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 40,
-                              height: 30,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                    backgroundColor: Colors.white),
-                                onPressed: () {
-                                  if (menunum[index] == 9) {
-                                  } else {
-                                    setState(() {
-                                      menunum[index]++;
-                                    });
-                                  }
-                                },
-                                child: Icon(
-                                  Icons.add,
-                                  color: secondColor,
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 17),
-                            Text(
-                              '${menunum[index]}',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color.fromARGB(255, 75, 75, 75),
-                              ),
-                            ),
-                            const SizedBox(width: 17),
-                            SizedBox(
-                              width: 40,
-                              height: 30,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                    backgroundColor: Colors.white),
-                                onPressed: () {
-                                  if (menunum[index] == 0) {
-                                  } else {
-                                    setState(() {
-                                      menunum[index]--;
-                                    });
-                                  }
-                                },
-                                child: Icon(
-                                  Icons.remove,
-                                  color: secondColor,
+                              const SizedBox(width: 17),
+                              Text(
+                                '${menunum[index]}',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color.fromARGB(255, 75, 75, 75),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                          ],
-                        )
-                      ],
+                              const SizedBox(width: 17),
+                              SizedBox(
+                                width: 40,
+                                height: 30,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      backgroundColor: Colors.white),
+                                  onPressed: () {
+                                    if (menunum[index] == 9) {
+                                    } else {
+                                      setState(() {
+                                        menunum[index]++;
+                                      });
+                                    }
+                                  },
+                                  child: Icon(
+                                    Icons.add,
+                                    color: secondColor,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                            ],
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
             const SizedBox(
               height: 15,

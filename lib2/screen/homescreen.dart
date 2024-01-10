@@ -28,25 +28,62 @@ class HomeScreenState extends State<HomeScreen> {
   int currentpage = 0;
   String userid = '';
 
-  List pages = ['a', 'b', 'c']; // TODO: 위젯 리스트로 교체
-
   double pagewidth = 300;
   double pageheight = 170;
 
+  double latitude = 0;
+  double longitude = 0;
+
   List sessions = [];
+  List spots = [];
+  int locationid = 0;
 
   @override
   Widget build(BuildContext context) {
     currentlocation = context.watch<UserProvider>().location;
+    locationid = context.watch<UserProvider>().locationid - 1;
     userid = context.watch<UserProvider>().userid;
     pagewidth = MediaQuery.of(context).size.width - 30;
 
     context.read<UserProvider>().inupdate(userid);
+    spots = context.watch<Spots>().spots;
 
+    latitude = spots[locationid]["latitude"];
+    longitude = spots[locationid]["longitude"];
+
+    List<Widget> pages = [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
+        child: SizedBox(
+          height: pagewidth - 90,
+          width: pagewidth - 40,
+          child: Image.asset(
+            'images/official.png',
+          ),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+        child: SizedBox(
+          height: pagewidth - 90,
+          width: pagewidth - 40,
+          child: Image.asset(
+            'images/event.png',
+          ),
+        ),
+      ),
+      SizedBox(
+        height: pagewidth / 2 - 20,
+        width: pagewidth / 2 - 7.5,
+        child: Image.asset(
+          'images/official.png',
+        ),
+      ),
+    ];
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: primaryColor,
         surfaceTintColor: Colors.white, // body 위에 hover할 때의 색깔 지정
         title: Padding(
           padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
@@ -61,7 +98,7 @@ class HomeScreenState extends State<HomeScreen> {
                       children: [
                         Icon(
                           Icons.location_on_outlined,
-                          color: secondColor,
+                          color: third,
                           size: 23,
                         ),
                         TextButton(
@@ -77,7 +114,7 @@ class HomeScreenState extends State<HomeScreen> {
                           child: Text(
                             currentlocation,
                             style: TextStyle(
-                              color: secondColor,
+                              color: third,
                               fontWeight: FontWeight.bold,
                               fontSize: 17,
                             ),
@@ -100,7 +137,7 @@ class HomeScreenState extends State<HomeScreen> {
                         },
                         icon: Icon(
                           Icons.home_outlined,
-                          color: secondColor,
+                          color: third,
                           size: 23,
                         ),
                       ),
@@ -108,7 +145,7 @@ class HomeScreenState extends State<HomeScreen> {
                         onPressed: () {},
                         icon: Icon(
                           Icons.menu,
-                          color: secondColor,
+                          color: third,
                           size: 23,
                         ),
                       ),
@@ -127,51 +164,74 @@ class HomeScreenState extends State<HomeScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: secondColor,
-                      width: 1,
-                    ),
-                    borderRadius: const BorderRadius.horizontal(
-                      left: Radius.circular(30),
-                      right: Radius.circular(30),
-                    ),
-                  ),
-                  width: pagewidth,
-                  height: 45,
-                  child: TextFormField(
-                    controller: searchController,
-                    onFieldSubmitted: (input) {
-                      Navigator.of(context).push(
-                        SwipeablePageRoute(
-                          canOnlySwipeFromEdge: true,
-                          builder: (BuildContext context) =>
-                              SessionScreen(input: input),
-                        ),
-                      );
-                    },
-                    decoration: InputDecoration(
-                      hintText: '먹고 싶은 메뉴를 검색하세요!',
-                      hintStyle: TextStyle(
-                        color: secondColor,
-                        fontSize: 15,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: secondColor,
-                        size: 23,
-                      ),
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                    ),
+              Container(
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(15),
+                    bottomRight: Radius.circular(15),
                   ),
                 ),
+                child: Column(
+                  children: [
+                    // const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: third,
+                          border: Border.all(
+                            color: third,
+                            width: 1,
+                          ),
+                          borderRadius: const BorderRadius.horizontal(
+                            left: Radius.circular(30),
+                            right: Radius.circular(30),
+                          ),
+                        ),
+                        width: pagewidth,
+                        height: 45,
+                        child: TextFormField(
+                          controller: searchController,
+                          onFieldSubmitted: (input) {
+                            Navigator.of(context).push(
+                              SwipeablePageRoute(
+                                canOnlySwipeFromEdge: true,
+                                builder: (BuildContext context) =>
+                                    SessionScreen(
+                                  input: input,
+                                  userid: userid,
+                                  latitude: latitude,
+                                  longitude: longitude,
+                                ),
+                              ),
+                            );
+                          },
+                          decoration: InputDecoration(
+                            hintText: '먹고 싶은 메뉴를 검색하세요!',
+                            hintStyle: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w300,
+                              fontSize: 15,
+                            ),
+                            prefixIcon: Icon(
+                              Icons.search,
+                              color: secondColor,
+                              size: 23,
+                            ),
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
               FutureBuilder(
                 future: loadmysession(userid),
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -189,16 +249,18 @@ class HomeScreenState extends State<HomeScreen> {
                       return Column(
                         children: [
                           Mysession(
-                              sessionid: snapshot.data?[0]["id"],
-                              storename: snapshot.data?[0]["name"],
-                              locationid: snapshot.data?[0]["location_id"],
-                              currentorder: snapshot.data?[0]["currentorder"],
-                              fianlorder: snapshot.data?[0]["finalorder"],
-                              finaltime: snapshot.data?[0]["finaltime"],
-                              createtime: DateTime.parse(
-                                  snapshot.data?[0]["create_time"]),
-                              membernum: snapshot.data?[0]["membernum"],
-                              userorder: snapshot.data[1]["userorder"])
+                            sessionid: snapshot.data?[0]["id"],
+                            storename: snapshot.data?[0]["name"],
+                            locationid: snapshot.data?[0]["location_id"],
+                            currentorder: snapshot.data?[0]["currentorder"],
+                            fianlorder: snapshot.data?[0]["finalorder"],
+                            finaltime: snapshot.data?[0]["finaltime"],
+                            createtime: DateTime.parse(
+                                snapshot.data?[0]["create_time"]),
+                            membernum: snapshot.data?[0]["membernum"],
+                            userorder: snapshot.data[1]["userorder"],
+                            info: snapshot.data,
+                          )
                         ],
                       );
                     }
@@ -229,11 +291,11 @@ class HomeScreenState extends State<HomeScreen> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: secondColor,
+                                color: Colors.grey,
                                 width: 1,
                               ),
                             ),
-                            child: Center(child: Text('${pages[index]}')),
+                            child: Center(child: pages[index]),
                           ),
                           SizedBox(
                             // 점으로 된 페이지 표시 기능
@@ -251,9 +313,13 @@ class HomeScreenState extends State<HomeScreen> {
                                     width: 6,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: primaryColor,
+                                        width: 0.7,
+                                      ),
                                       color: i == currentpage
-                                          ? Colors.black87
-                                          : secondColor,
+                                          ? secondColor
+                                          : Colors.white,
                                     ),
                                   )
                               ],
@@ -265,7 +331,7 @@ class HomeScreenState extends State<HomeScreen> {
                   },
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
               Padding(
                 padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
                 child: Row(
@@ -276,26 +342,20 @@ class HomeScreenState extends State<HomeScreen> {
                         Navigator.of(context).push(
                           SwipeablePageRoute(
                             canOnlySwipeFromEdge: true,
-                            builder: (BuildContext context) =>
-                                const SessionScreen(input: ''),
+                            builder: (BuildContext context) => SessionScreen(
+                              input: '',
+                              userid: userid,
+                              latitude: latitude,
+                              longitude: longitude,
+                            ),
                           ),
                         );
                       },
-                      child: Container(
-                        height: 70,
+                      child: SizedBox(
+                        height: pagewidth / 2 - 20,
                         width: pagewidth / 2 - 7.5,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: secondColor,
-                            width: 1,
-                          ),
-                          borderRadius: const BorderRadius.horizontal(
-                            left: Radius.circular(16),
-                            right: Radius.circular(16),
-                          ),
-                        ),
-                        child: const Center(
-                          child: Text('세션 검색'),
+                        child: Image.asset(
+                          'images/map.png',
                         ),
                       ),
                     ),
@@ -305,91 +365,87 @@ class HomeScreenState extends State<HomeScreen> {
                           SwipeablePageRoute(
                             canOnlySwipeFromEdge: true,
                             builder: (BuildContext context) =>
-                                const MapScreen(),
+                                MapScreen(userid: userid),
                           ),
                         );
                       },
-                      child: Container(
-                        height: 70,
+                      child: SizedBox(
+                        height: pagewidth / 2 - 20,
                         width: pagewidth / 2 - 7.5,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: secondColor,
-                            width: 1,
-                          ),
-                          borderRadius: const BorderRadius.horizontal(
-                            left: Radius.circular(16),
-                            right: Radius.circular(16),
-                          ),
-                        ),
-                        child: const Center(
-                          child: Text('지도 검색'),
+                        child: Image.asset(
+                          'images/search.png',
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
-              Container(
-                // 추가 기능 버튼이 들어갈 버튼
-                height: pageheight - 50,
-                width: pagewidth + 10,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: secondColor,
-                    width: 1,
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                child: Container(
+                  // 추가 기능 버튼이 들어갈 버튼
+                  height: pageheight - 50,
+                  width: pagewidth + 10,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 1,
+                    ),
+                    borderRadius: const BorderRadius.horizontal(
+                      left: Radius.circular(16),
+                      right: Radius.circular(16),
+                    ),
                   ),
-                  borderRadius: const BorderRadius.horizontal(
-                    left: Radius.circular(30),
-                    right: Radius.circular(30),
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(
-                                SwipeablePageRoute(
-                                  canOnlySwipeFromEdge: true,
-                                  builder: (BuildContext context) =>
-                                      const Chatrooms(),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  SwipeablePageRoute(
+                                    canOnlySwipeFromEdge: true,
+                                    builder: (BuildContext context) =>
+                                        const Chatrooms(),
+                                  ),
+                                );
+                              },
+                              child: const SizedBox(
+                                width: 50,
+                                height: 50,
+                                child: Image(
+                                  image: AssetImage('images/chat.png'),
                                 ),
-                              );
-                            },
-                            child: SizedBox(
-                              width: 50,
-                              height: 50,
-                              child:
-                                  Icon(Icons.chat_outlined, color: primaryColor, size: 40),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 15,),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(
-                                SwipeablePageRoute(
-                                  canOnlySwipeFromEdge: true,
-                                  builder: (BuildContext context) =>
-                                      Board(),
+                            const SizedBox(
+                              width: 30,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  SwipeablePageRoute(
+                                    canOnlySwipeFromEdge: true,
+                                    builder: (BuildContext context) => Board(),
+                                  ),
+                                );
+                              },
+                              child: const SizedBox(
+                                width: 50,
+                                height: 50,
+                                child: Image(
+                                  image: AssetImage('images/board.png'),
                                 ),
-                              );
-                            },
-                            child: SizedBox(
-                              width: 50,
-                              height: 50,
-                              child:
-                                  Icon(Icons.content_paste, color: primaryColor, size: 40),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

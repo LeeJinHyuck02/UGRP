@@ -50,6 +50,62 @@ class _Part2State extends State<Part2> {
   void place() {}
   void backtoselect() {}
 
+  void dialog() {
+    showDialog(
+      context: context,
+      //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+          backgroundColor: Colors.white,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          //Dialog Main Title
+          title: const Column(
+            children: <Widget>[
+              Text(
+                "안내",
+                style: TextStyle(fontSize: 20),
+              ),
+            ],
+          ),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                "이미 세션에 참여 중이라면, 세션 생성 및 참여가 불가능합니다.",
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            SizedBox(
+              height: 35,
+              width: 80,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor, // Background color
+                ),
+                child: const Text(
+                  "확인",
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     currentlocation = context.watch<UserProvider>().location;
@@ -66,19 +122,21 @@ class _Part2State extends State<Part2> {
         centerTitle: true,
         title: const Text(
           '세션 참여',
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: Colors.black, fontSize: 17),
         ),
       ),
       floatingActionButton: SizedBox(
         width: MediaQuery.of(context).size.width - 40,
         height: 45,
         child: FloatingActionButton.extended(
-          backgroundColor: Colors.grey[200],
+          backgroundColor: primaryColor,
           elevation: 0,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           onPressed: insession
-              ? null
+              ? () {
+                  dialog();
+                }
               : () {
                   addmember(userid, widget.sessionid, totalOrderPrice.round(),
                       widget.userorder);
@@ -93,7 +151,7 @@ class _Part2State extends State<Part2> {
                 },
           icon: const Icon(
             Icons.shopping_cart,
-            color: Colors.black, // 아이콘의 색상 설정
+            color: Colors.white, // 아이콘의 색상 설정
           ),
           label: const Padding(
             padding: EdgeInsets.symmetric(
@@ -101,7 +159,7 @@ class _Part2State extends State<Part2> {
             child: Text(
               '배달 주문하기',
               style: TextStyle(
-                color: Colors.black,
+                color: Colors.white,
               ),
             ),
           ),
@@ -149,7 +207,7 @@ class _Part2State extends State<Part2> {
                             onPressed: backtoselect,
                             child: Text(
                               currentlocation,
-                              style: TextStyle(color: secondColor),
+                              style: const TextStyle(color: Colors.black),
                             ),
                           ),
                         ],
@@ -234,9 +292,14 @@ class _Part2State extends State<Part2> {
                                       children: [
                                         TextButton.icon(
                                           onPressed: backtoselect,
-                                          icon: const Icon(Icons.add),
-                                          label: const Text(
+                                          icon: Icon(
+                                            Icons.add,
+                                            color: primaryColor,
+                                          ),
+                                          label: Text(
                                             '옵션 추가',
+                                            style:
+                                                TextStyle(color: primaryColor),
                                           ),
                                         ),
                                       ],

@@ -165,6 +165,7 @@ class LoginScreenState extends State<LoginScreen> {
                                     context.read<UserProvider>().idupdate(userid.text);
                                     context.read<Menu>().menuupdate();
                                     context.read<Spots>().spotsupdate();
+                                    
                                   },
                                   style: ButtonStyle(
                                     backgroundColor:

@@ -69,6 +69,7 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     currentlocation = context.watch<UserProvider>().location;
     return Scaffold(
+      backgroundColor: third,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
@@ -91,7 +92,7 @@ class _MenuScreenState extends State<MenuScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                             Navigator.of(context).push(
+                            Navigator.of(context).push(
                               SwipeablePageRoute(
                                 canOnlySwipeFromEdge: true,
                                 builder: (BuildContext context) =>
@@ -151,10 +152,13 @@ class _MenuScreenState extends State<MenuScreen> {
             Container(
               child: Stack(
                 children: <Widget>[
-                  Container(
-                    width: double.infinity,
-                    height: 150,
-                    color: Colors.grey,
+                  Card(
+                    elevation: 0.5,
+                    child: Container(
+                      width: double.infinity,
+                      height: 150,
+                      color: Colors.white,
+                    ),
                   ),
                   Container(
                     width: double.infinity,
@@ -166,20 +170,16 @@ class _MenuScreenState extends State<MenuScreen> {
                     child: Column(
                       children: [
                         const SizedBox(height: 25),
-                        Card(
-                          elevation: 5,
-                          child: InkWell(
-                            child: SizedBox(
-                              width: 200,
-                              height: 100,
-                              child: Center(
-                                child: Text(
-                                  widget.selectedgage,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                        SizedBox(
+                          width: 250,
+                          height: 100,
+                          child: Center(
+                            child: Text(
+                              widget.selectedgage,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
@@ -198,33 +198,36 @@ class _MenuScreenState extends State<MenuScreen> {
                 ],
               ),
             ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: widget.menu.length,
-              itemBuilder: (BuildContext context, int index) {
-                return SizedBox(
-                  height: 90, // width: 180,
-                  child: Card(
-                    color: Colors.white,
-                    elevation: 5,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
+            Padding(
+              padding: const EdgeInsets.fromLTRB(15, 0 , 15, 0),
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: widget.menu.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return SizedBox(
+                    height: 80,
+                    width: 20,
+                    child: Card(
+                      color: Colors.white,
+                      surfaceTintColor: Colors.white,
+                      elevation: 0.7,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                 child: SizedBox(
+                                  width: MediaQuery.of(context).size.width - 200,
                                   child: Text(
                                     widget.menu[index]['menu'],
-                                    style: TextStyle(
-                                      fontSize: 19,
-                                      fontWeight: FontWeight.bold,
-                                      color: secondColor,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black,
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -234,33 +237,36 @@ class _MenuScreenState extends State<MenuScreen> {
                               const SizedBox(
                                 height: 5,
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(12, 0, 0, 0),
-                                    child: Text(
-                                      '${widget.menu[index]['price']} 원',
-                                      style: const TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color.fromARGB(255, 75, 75, 75),
+                              SizedBox(
+                                width: 150,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(12, 0, 0, 0),
+                                      child: Text(
+                                        '${widget.menu[index]['price']} 원',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color.fromARGB(255, 75, 75, 75),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 40,
-                              height: 30,
-                              child: ElevatedButton(
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 40,
+                                height: 30,
+                                child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                       padding: EdgeInsets.zero,
                                       backgroundColor: Colors.white),
@@ -275,22 +281,23 @@ class _MenuScreenState extends State<MenuScreen> {
                                   child: Icon(
                                     Icons.remove,
                                     color: secondColor,
-                                  )),
-                            ),
-                            const SizedBox(width: 17),
-                            Text(
-                              '${menunum[index]}',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color.fromARGB(255, 75, 75, 75),
+                                  ),
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 17),
-                            SizedBox(
-                              width: 40,
-                              height: 30,
-                              child: ElevatedButton(
+                              const SizedBox(width: 17),
+                              Text(
+                                '${menunum[index]}',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color.fromARGB(255, 75, 75, 75),
+                                ),
+                              ),
+                              const SizedBox(width: 17),
+                              SizedBox(
+                                width: 40,
+                                height: 30,
+                                child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                       padding: EdgeInsets.zero,
                                       backgroundColor: Colors.white),
@@ -305,16 +312,18 @@ class _MenuScreenState extends State<MenuScreen> {
                                   child: Icon(
                                     Icons.add,
                                     color: secondColor,
-                                  )),
-                            ),
-                            const SizedBox(width: 12),
-                          ],
-                        )
-                      ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                            ],
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
             const SizedBox(
               height: 15,
@@ -328,12 +337,11 @@ class _MenuScreenState extends State<MenuScreen> {
                   SwipeablePageRoute(
                     canOnlySwipeFromEdge: true,
                     builder: (BuildContext context) => CheckScreen(
-                      userorder: userorder,
-                      selectedgage: widget.selectedgage,
-                      category: widget.category,
-                      finalorder: widget.finalorder,
-                      tip: widget.tip
-                    ),
+                        userorder: userorder,
+                        selectedgage: widget.selectedgage,
+                        category: widget.category,
+                        finalorder: widget.finalorder,
+                        tip: widget.tip),
                   ),
                 );
               },

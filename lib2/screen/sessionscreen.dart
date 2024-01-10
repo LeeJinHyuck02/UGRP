@@ -12,8 +12,17 @@ import 'package:prototype_2/add/add1.dart';
 
 class SessionScreen extends StatefulWidget {
   final String input;
+  final String userid;
+  final double latitude;
+  final double longitude;
 
-  const SessionScreen({Key? key, required this.input}) : super(key: key);
+  const SessionScreen({
+    Key? key,
+    required this.input,
+    required this.userid,
+    required this.latitude,
+    required this.longitude,
+  }) : super(key: key);
 
   @override
   SessionScreenstate createState() => SessionScreenstate();
@@ -71,7 +80,11 @@ class SessionScreenstate extends State<SessionScreen> {
   }
 
   void waitforsessions() async {
-    sessions = await loadsessions('qqqq'); // TODO: userid 변경
+    sessions = await loadsessions(
+      widget.userid,
+      widget.latitude,
+      widget.longitude,
+    );
     filteredSessions = sessions;
     setState(() {});
   }
@@ -94,8 +107,8 @@ class SessionScreenstate extends State<SessionScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
+        backgroundColor: primaryColor,
+        surfaceTintColor: Colors.white, // body 위에 hover할 때의 색깔 지정
         title: Padding(
           padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
           child: Column(
@@ -109,7 +122,7 @@ class SessionScreenstate extends State<SessionScreen> {
                       children: [
                         Icon(
                           Icons.location_on_outlined,
-                          color: secondColor,
+                          color: third,
                           size: 23,
                         ),
                         TextButton(
@@ -125,7 +138,7 @@ class SessionScreenstate extends State<SessionScreen> {
                           child: Text(
                             currentlocation,
                             style: TextStyle(
-                              color: secondColor,
+                              color: third,
                               fontWeight: FontWeight.bold,
                               fontSize: 17,
                             ),
@@ -148,7 +161,7 @@ class SessionScreenstate extends State<SessionScreen> {
                         },
                         icon: Icon(
                           Icons.home_outlined,
-                          color: secondColor,
+                          color: third,
                           size: 23,
                         ),
                       ),
@@ -156,7 +169,7 @@ class SessionScreenstate extends State<SessionScreen> {
                         onPressed: () {},
                         icon: Icon(
                           Icons.menu,
-                          color: secondColor,
+                          color: third,
                           size: 23,
                         ),
                       ),
@@ -171,7 +184,6 @@ class SessionScreenstate extends State<SessionScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: secondColor,
         elevation: 15,
-        child: Icon(Icons.add, color: Colors.white),
         heroTag: null,
         onPressed: () {
           Navigator.of(context).push(
@@ -181,6 +193,7 @@ class SessionScreenstate extends State<SessionScreen> {
             ),
           );
         },
+        child: const Icon(Icons.add, color: Colors.white),
       ),
       body: GestureDetector(
         onTap: () {
@@ -189,51 +202,69 @@ class SessionScreenstate extends State<SessionScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: secondColor,
-                      width: 1,
-                    ),
-                    borderRadius: const BorderRadius.horizontal(
-                      left: Radius.circular(30),
-                      right: Radius.circular(30),
-                    ),
+              Container(
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(15),
+                    bottomRight: Radius.circular(15),
                   ),
-                  width: pagewidth,
-                  height: 45,
-                  child: TextField(
-                    controller: searchController,
-                    textInputAction: TextInputAction.go,
-                    onSubmitted: (search) {
-                      searchController.text = search;
+                ),
+                child: Column(
+                  children: [
+                    // const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: third,
+                          border: Border.all(
+                            color: secondColor,
+                            width: 1,
+                          ),
+                          borderRadius: const BorderRadius.horizontal(
+                            left: Radius.circular(30),
+                            right: Radius.circular(30),
+                          ),
+                        ),
+                        width: pagewidth,
+                        height: 45,
+                        child: TextField(
+                          controller: searchController,
+                          textInputAction: TextInputAction.go,
+                          onSubmitted: (search) {
+                            searchController.text = search;
 
-                      setState(() {
-                        waitforsessions();
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: '먹고 싶은 메뉴를 검색하세요!',
-                      hintStyle: TextStyle(
-                        color: secondColor,
-                        fontSize: 15,
+                            setState(() {
+                              waitforsessions();
+                            });
+                          },
+                          decoration: InputDecoration(
+                            hintText: '먹고 싶은 메뉴를 검색하세요!',
+                            hintStyle: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w300,
+                              fontSize: 15,
+                            ),
+                            prefixIcon: Icon(
+                              Icons.search,
+                              color: secondColor,
+                              size: 23,
+                            ),
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                          ),
+                        ),
                       ),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: secondColor,
-                        size: 23,
-                      ),
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
                     ),
-                  ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(
-                height: 16,
+                height: 8,
               ),
               if (sessions.isEmpty)
                 SizedBox(

@@ -10,7 +10,8 @@ import 'package:prototype_2/assets/provider.dart';
 import 'homescreen.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({Key? key}) : super(key: key);
+  final String userid;
+  const MapScreen({Key? key, required this.userid}) : super(key: key);
 
   @override
   State<MapScreen> createState() => MapScreenstate();
@@ -34,8 +35,9 @@ class MapScreenstate extends State<MapScreen> with TickerProviderStateMixin {
     _markers.addAll(
       spots.map(
         (e) => Marker(
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan),
           markerId: MarkerId(e["name"] as String),
-          infoWindow: InfoWindow(title: e["name"] as String, snippet: '으악!'),
+          infoWindow: InfoWindow(title: e["name"] as String),
           position: LatLng(
             e['latitude'] as double,
             e['longitude'] as double,
@@ -50,7 +52,12 @@ class MapScreenstate extends State<MapScreen> with TickerProviderStateMixin {
               context: context,
               transitionAnimationController: bottomcontroller,
               builder: (context) {
-                return MyBottomSheet(location_id: e["id"]);
+                return MyBottomSheet(
+                  location_id:  e["id"],
+                  userid:       widget.userid,
+                  latitude:     e['latitude'],
+                  longitude:    e['longitude'],
+                );
               },
               backgroundColor: const Color.fromARGB(0, 0, 0, 0),
             );
@@ -170,7 +177,7 @@ class MapScreenstate extends State<MapScreen> with TickerProviderStateMixin {
               : Expanded(
                   child: GoogleMap(
                     initialCameraPosition:
-                        CameraPosition(target: initiallocation, zoom: 17),
+                        const CameraPosition(target: LatLng(36.012151, 129.323573), zoom: 17),
                     myLocationButtonEnabled: true,
                     myLocationEnabled: true,
                     mapType: MapType.normal,
@@ -180,7 +187,7 @@ class MapScreenstate extends State<MapScreen> with TickerProviderStateMixin {
                         return setState(
                           () {
                             _controller = controller;
-                            _controller.setMapStyle(MapStyle().dark);
+                            _controller.setMapStyle(MapStyle().sliver);
                           },
                         );
                       }
@@ -195,23 +202,34 @@ class MapScreenstate extends State<MapScreen> with TickerProviderStateMixin {
 
 class MyBottomSheet extends StatefulWidget {
   final int location_id;
+  final String userid;
+  final double latitude;
+  final double longitude;
 
-  MyBottomSheet({Key? key, required this.location_id});
+  MyBottomSheet({
+    Key? key,
+    required this.location_id,
+    required this.userid,
+    required this.latitude,
+    required this.longitude,
+  });
 
   @override
   _MyBottomSheetState createState() => _MyBottomSheetState();
 }
 
 class _MyBottomSheetState extends State<MyBottomSheet> {
-
   List sessions = [];
   List filteredSessions = [];
 
   void waitforsessions() async {
-    sessions = await loadsessions('qqqq');
+    sessions = await loadsessions(
+      widget.userid,
+      widget.latitude,
+      widget.longitude,
+    );
     filteredSessions = sessions;
-    if (mounted)
-      setState(() {});
+    if (mounted) setState(() {});
   }
 
   @override

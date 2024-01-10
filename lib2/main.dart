@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:prototype_2/community/board.dart';
 import 'package:provider/provider.dart';
 
 import 'package:prototype_2/assets/provider.dart';
 import 'package:prototype_2/screen/loginscreen.dart';
-
-import 'package:prototype_2/community/chatrooms.dart';
-
+import 'package:prototype_2/screen/survey.dart';
 
 void main() {
   runApp(

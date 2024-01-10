@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 import 'package:prototype_2/part/part1.dart';
+import 'package:prototype_2/screen/mysessionscreen.dart';
 
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
@@ -12,8 +13,9 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:prototype_2/assets/provider.dart';
 import 'package:prototype_2/assets/api.dart';
 
-Color primaryColor = const Color.fromARGB(200, 200, 1, 80);
-Color secondColor = const Color.fromARGB(200, 200, 1, 80);
+Color primaryColor = const Color.fromARGB(255, 72, 209, 204);
+Color secondColor = const Color.fromARGB(255, 72, 209, 205);
+Color third = const Color.fromARGB(255, 255, 255, 255);
 
 // const Color.fromARGB(240, 102, 102, 92);
 
@@ -103,7 +105,7 @@ class _session_infoState extends State<session_info> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: secondColor,
+            color: Colors.grey,
             width: 1,
           ),
         ),
@@ -136,6 +138,7 @@ class _session_infoState extends State<session_info> {
                         const Icon(
                           Icons.person,
                           size: 18,
+                          color: Colors.black,
                         ),
                     ],
                   )
@@ -256,11 +259,11 @@ class _TimerScreenState extends State<TimerScreen> {
       child: Center(
         child: CircularCountDownTimer(
           duration: _duration * 60,
-          initialDuration: 150,
+          initialDuration: _initialduration,
           controller: _controller,
           width: 80,
           height: 80,
-          fillColor: Colors.black,
+          fillColor: primaryColor,
           ringColor: Colors.white,
           isReverse: true,
           isReverseAnimation: true,
@@ -281,18 +284,21 @@ class Mysession extends StatefulWidget {
   final DateTime createtime;
   final int membernum;
   final List userorder;
+  final List info;
 
-  const Mysession(
-      {super.key,
-      required this.sessionid,
-      required this.storename,
-      required this.locationid,
-      required this.currentorder,
-      required this.fianlorder,
-      required this.finaltime,
-      required this.createtime,
-      required this.membernum,
-      required this.userorder});
+  const Mysession({
+    super.key,
+    required this.sessionid,
+    required this.storename,
+    required this.locationid,
+    required this.currentorder,
+    required this.fianlorder,
+    required this.finaltime,
+    required this.createtime,
+    required this.membernum,
+    required this.userorder,
+    required this.info,
+  });
 
   @override
   State<Mysession> createState() => _MysessionState();
@@ -312,11 +318,11 @@ class _MysessionState extends State<Mysession>
     super.initState();
 
     _controller = AnimationController(
-      duration: const Duration(minutes: 5, seconds: 10), // 여기서 시간을 조절.
+      duration: Duration(minutes: (widget.finaltime * 60 - now.difference(widget.createtime).inSeconds) ~/ 60, seconds: (widget.finaltime * 60 - now.difference(widget.createtime).inSeconds) % 60), // 여기서 시간을 조절.
       vsync: this,
     );
 
-    _animation = Tween<double>(begin: 1.0, end: 0.05).animate(_controller)
+    _animation = Tween<double>(begin: 1.0, end: 0.09).animate(_controller)
       ..addListener(() {
         setState(() {});
       });
@@ -348,119 +354,134 @@ class _MysessionState extends State<Mysession>
     String formattedMinutes = minutes.toString().padLeft(2, '0');
     String formattedSeconds = seconds.toString().padLeft(2, '0');
 
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: secondColor,
-          width: 1,
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          SwipeablePageRoute(
+            canOnlySwipeFromEdge: true,
+            builder: (BuildContext context) => Mysessionscreen(
+              info: widget.info,
+              sessionid: widget.sessionid,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.grey,
+            width: 0.7,
+          ),
+          borderRadius: const BorderRadius.horizontal(
+            left: Radius.circular(16),
+            right: Radius.circular(16),
+          ),
         ),
-        borderRadius: const BorderRadius.horizontal(
-          left: Radius.circular(16),
-          right: Radius.circular(16),
-        ),
-      ),
-      width: width,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 8),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.gps_fixed,
-                  size: 18,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  location,
-                  style: const TextStyle(fontSize: 14),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 6,
-            ),
-            Text(
-              widget.storename,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(
-              height: 6,
-            ),
-            SizedBox(
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: widget.userorder.length ~/ 2,
-                itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        top: BorderSide(width: 0.5, color: Colors.black),
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 3),
-                        Text(
-                          '  메뉴:  ${widget.userorder[index * 2]["menu"]}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[800],
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 4,
-                        ),
-                        Text(
-                          '  가격:  ${widget.userorder[index * 2]["price"] * widget.userorder[index * 2 + 1]}원',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: secondColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 8),
-            Stack(
-              children: [
-                LinearPercentIndicator(
-                  lineHeight: 27.0,
-                  width: width - 35,
-                  percent: _animation.value,
-                  barRadius: const Radius.circular(16),
-                  backgroundColor: Colors.white,
-                  progressColor: secondColor,
-                  center: Text(
-                    '$formattedMinutes 분 $formattedSeconds 초',
-                    style: const TextStyle(color: Colors.white),
+        width: width,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 8),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.gps_fixed,
+                    size: 18,
                   ),
-                ),
-                if (_animation.value <= 0.05) ...[
-                  const Positioned(
-                    left: 10, // 체크표시 아이콘의 위치를 조절합니다.
-                    top: 0,
-                    bottom: 0,
-                    child: Center(
-                      child: Icon(Icons.check, color: Colors.white),
-                    ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    location,
+                    style: const TextStyle(fontSize: 14),
                   ),
                 ],
-              ],
-            ),
-            const SizedBox(height: 8),
-          ],
+              ),
+              const SizedBox(
+                height: 6,
+              ),
+              Text(
+                widget.storename,
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(
+                height: 6,
+              ),
+              SizedBox(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: widget.userorder.length ~/ 2,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Container(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          top: BorderSide(width: 0.5, color: Colors.black),
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 3),
+                          Text(
+                            '  메뉴:  ${widget.userorder[index * 2]["menu"]}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[800],
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          Text(
+                            '  가격:  ${widget.userorder[index * 2]["price"] * widget.userorder[index * 2 + 1]}원',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[800],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 8),
+              Stack(
+                children: [
+                  LinearPercentIndicator(
+                    lineHeight: 27.0,
+                    width: width - 35,
+                    percent: _animation.value,
+                    barRadius: const Radius.circular(16),
+                    backgroundColor: Colors.white,
+                    progressColor: secondColor,
+                    center: Text(
+                      '$formattedMinutes 분 $formattedSeconds 초',
+                      style: const TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.w300),
+                    ),
+                  ),
+                  if (_animation.value <= 0.09) ...[
+                    const Positioned(
+                      left: 10, // 체크표시 아이콘의 위치를 조절합니다.
+                      top: 0,
+                      bottom: 0,
+                      child: Center(
+                        child: Icon(Icons.check, color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
         ),
       ),
     );
@@ -483,7 +504,7 @@ class Chatbubble extends StatelessWidget {
   Widget build(BuildContext context) {
     return BubbleSpecialThree(
       text: message,
-      color: isSender ? primaryColor : Color.fromARGB(153, 190, 0, 76),
+      color: isSender ? primaryColor : const Color.fromARGB(83, 133, 133, 133),
       tail: isEnd,
       isSender: isSender,
       textStyle: const TextStyle(color: Colors.white, fontSize: 12),
@@ -519,14 +540,14 @@ class _BoarddetailState extends State<Boarddetail> {
   void waitforcomments() async {
     comments = await loadcomment(widget.board_id);
     setState(() {});
-  } 
+  }
 
   @override
   void dispose() {
     _commentController.dispose();
     super.dispose();
   }
-  
+
   @override
   void initState() {
     waitforcomments();
@@ -540,102 +561,428 @@ class _BoarddetailState extends State<Boarddetail> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 0,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
         backgroundColor: Colors.white,
-        title: const Text(
-          "게시판",
-          style: TextStyle(color: Colors.black),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.white,
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+          elevation: 0,
+          title: const Text(
+            "게시판",
+            style: TextStyle(color: Colors.black),
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.person_2_rounded),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  Column(
+        body: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height - 50,
+                child: SingleChildScrollView(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(widget.board_name),
-                      Text(formatDateTime(widget.create_time)),
+                      Row(
+                        children: [
+                          const Icon(Icons.person_2_rounded),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(widget.board_name),
+                              Text(formatDateTime(widget.create_time)),
+                            ],
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      SizedBox(
+                        child: Text(
+                          widget.board_title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 23,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      SizedBox(
+                        // width: MediaQuery.of(context).size.width - 50,
+                        height: 30 + (widget.board_text.length / 23) * 30,
+                        child: Text(
+                          widget.board_text,
+                          style: const TextStyle(fontSize: 19),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Divider(thickness: 0.7, color: Colors.black),
+                      const SizedBox(height: 10),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: comments.length,
+                        itemBuilder: (context, index) {
+                          String? a = comments[index]["usertext"];
+                          return Card(
+                            elevation: 0,
+                            color: Colors.grey.shade100,
+                            child: Container(
+                              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                              width: 50,
+                              height:
+                                  a == null ? 80 : 80 + (a!.length / 50) * 20,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      const SizedBox(width: 10),
+                                      const Icon(Icons.person_2_rounded,
+                                          size: 20),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      SizedBox(
+                                        width: 150,
+                                        height: 35,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              comments[index]['userid'],
+                                              style:
+                                                  const TextStyle(fontSize: 11),
+                                            ),
+                                            Text(
+                                              formatDateTime(
+                                                  widget.create_time),
+                                              style:
+                                                  const TextStyle(fontSize: 11),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      const SizedBox(width: 15),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width -
+                                                80,
+                                        child: Text(
+                                          comments[index]["usertext"],
+                                          style: const TextStyle(fontSize: 13),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(
+                        height: 45,
+                      ),
                     ],
-                  )
-                ],
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              Text(
-                widget.board_title,
-                style:
-                    const TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              Text(
-                widget.board_text,
-                style: const TextStyle(fontSize: 20),
-              ),
-              const SizedBox(height: 40),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: comments.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    elevation: 0,
-                    color: Colors.grey.shade100,
-                    child: Container(
-                      width: 50,
-                      constraints: const BoxConstraints(
-                        maxHeight: 100, // Maximum height
-                        minHeight: 50, // Minimum height
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(comments[index]["usertext"]), // Display each comment
-                      ),
-                    ),
-                  );
-                },
-              ),
-              TextField(
-                controller: _commentController,
-                decoration: InputDecoration(
-                  labelText: '댓글을 입력하세요!',
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: () {
-                      addcomments(widget.board_id, 'qqqq', _commentController.text);
-                      waitforcomments();
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      _commentController.text = '';
-                      setState(() {
-                        
-                      });
-                    },
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+              child: Container(
+                height: MediaQuery.of(context).size.height - 30,
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  height: 50,
+                  decoration: const BoxDecoration(color: Colors.white),
+                  child: TextFormField(
+                    controller: _commentController,
+                    decoration: InputDecoration(
+                      hintText: '댓글을 입력하세요!',
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.send),
+                        onPressed: () {
+                          addcomments(
+                              widget.board_id, 'qqqq', _commentController.text);
+                          waitforcomments();
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          _commentController.text = '';
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
+class Mysession2 extends StatefulWidget {
+  final int sessionid;
+  final String storename;
+  final int locationid;
+  final int currentorder;
+  final int fianlorder;
+  final int finaltime;
+  final DateTime createtime;
+  final int membernum;
+  final List userorder;
+
+  const Mysession2({
+    super.key,
+    required this.sessionid,
+    required this.storename,
+    required this.locationid,
+    required this.currentorder,
+    required this.fianlorder,
+    required this.finaltime,
+    required this.createtime,
+    required this.membernum,
+    required this.userorder,
+  });
+
+  @override
+  State<Mysession2> createState() => _Mysession2State();
+}
+
+class _Mysession2State extends State<Mysession2>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  DateTime now = DateTime.now();
+
+  int time = 15;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      duration: Duration(minutes: (widget.finaltime * 60 - now.difference(widget.createtime).inSeconds) ~/ 60, seconds: (widget.finaltime * 60 - now.difference(widget.createtime).inSeconds) % 60), // 여기서 시간을 조절.
+      vsync: this,
+    );
+
+    _animation = Tween<double>(begin: 1.0, end: 0.09).animate(_controller)
+      ..addListener(() {
+        setState(() {});
+      });
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    time = now.difference(widget.createtime).inSeconds; // 추후 작업 필요
+    String location =
+        context.watch<Spots>().spots[widget.locationid - 1]["name"].toString();
+    String userid = context.watch<UserProvider>().userid;
+    double width = MediaQuery.of(context).size.width - 30;
+    int minutes =
+        (((_controller.duration?.inSeconds ?? 0) * (1 - _controller.value))
+                    .round() /
+                60)
+            .floor();
+    int seconds =
+        ((_controller.duration?.inSeconds ?? 0) * (1 - _controller.value))
+                .round() %
+            60;
+    String formattedMinutes = minutes.toString().padLeft(2, '0');
+    String formattedSeconds = seconds.toString().padLeft(2, '0');
+
+    return Container(
+      /*decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.grey,
+          width: 0.7,
+        ),
+        borderRadius: const BorderRadius.horizontal(
+          left: Radius.circular(16),
+          right: Radius.circular(16),
+        ),
+      ),*/
+      width: width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
+          Text(
+            '${widget.storename} #${widget.sessionid}',
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "배달 장소: $location",
+                  style: const TextStyle(fontSize: 14),
+                ),
+                const SizedBox(
+                  height: 4,
+                ),
+                Text(
+                  "전체 주문 금액: ${widget.currentorder}",
+                  style: const TextStyle(fontSize: 14),
+                ),
+                const SizedBox(
+                  height: 4,
+                ),
+                Text(
+                  "목표 주문 금액: ${widget.fianlorder}",
+                  style: const TextStyle(fontSize: 14),
+                ),
+                const SizedBox(
+                  height: 4,
+                ),
+                const Text(
+                  "남은 시간",
+                  style: TextStyle(fontSize: 14),
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+              ],
+            ),
+          ),
+          Stack(
+            children: [
+              LinearPercentIndicator(
+                lineHeight: 27.0,
+                width: width - 35,
+                percent: _animation.value,
+                barRadius: const Radius.circular(16),
+                backgroundColor: Colors.white,
+                progressColor: secondColor,
+                center: Text(
+                  '$formattedMinutes 분 $formattedSeconds 초',
+                  style: const TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.w300),
+                ),
+              ),
+              if (_animation.value <= 0.09) ...[
+                const Positioned(
+                  left: 10, // 체크표시 아이콘의 위치를 조절합니다.
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: Icon(Icons.check, color: Colors.white),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            ' 상세 주문 내역',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[800],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '  나의 주문',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[800],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10,0,0,0),
+            child: Container(
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(width: 0.5, color: Colors.black),
+                ),
+              ),
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: widget.userorder.length ~/ 2,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 3),
+                        Text(
+                          '  메뉴:  ${widget.userorder[index * 2]["menu"]}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 4,
+                        ),
+                        Text(
+                          '  가격:  ${widget.userorder[index * 2]["price"]}원',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                        Text(
+                          '  수량:  ${widget.userorder[index * 2 + 1]}개',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 4,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+}
 
 class MapStyle {
   final String aubergine = """

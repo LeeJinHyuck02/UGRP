@@ -3,11 +3,14 @@ import 'package:http/http.dart' as http;
 
 import 'asset.dart';
 
-Future<List> loadsessions(String userid) async {
+Future<List> loadsessions(
+    String userid, double latitude, double longitude) async {
   var reqbody = {
     "userid": userid,
+    "latitude": latitude,
+    "longitude": longitude,
   };
-
+  // print(reqbody);
   var response = await http.post(
     Uri.parse("$server/sessions/load"),
     headers: {"Content-Type": "application/json"},
@@ -208,15 +211,12 @@ Future<List> loadrooms() async {
   return jsonResponse;
 }
 
-void addtexts(
-  String userid,
-  String title,
-  String usertext,
-) async {
+void addtexts(String userid, String title, String usertext, String name) async {
   var reqbody = {
     "userid": userid,
     "title": title,
     "usertext": usertext,
+    "name": name
   };
 
   var response = await http.post(
@@ -257,7 +257,6 @@ Future<List> loadboard(String name) async {
   return jsonResponse;
 }
 
-
 Future<List> loadcomment(int id) async {
   var reqbody = {
     "textid": id,
@@ -265,6 +264,22 @@ Future<List> loadcomment(int id) async {
 
   var response = await http.post(Uri.parse("$server/community/comment"),
       headers: {"Content-Type": "application/json"}, body: jsonEncode(reqbody));
+
+  List<dynamic> jsonResponse = json.decode(response.body);
+
+  return jsonResponse;
+}
+
+Future<List> loadorders(int sessionid) async {
+  var reqbody = {
+    "sessionid": sessionid,
+  };
+
+  var response = await http.post(
+    Uri.parse("$server/sessions/loadorders"),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(reqbody),
+  );
 
   List<dynamic> jsonResponse = json.decode(response.body);
 

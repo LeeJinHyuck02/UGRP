@@ -270,7 +270,7 @@ class _StoreScreenState extends State<StoreScreen> {
                         width: pagewidth - 110,
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: secondColor,
+                            color: Colors.grey,
                             width: 1,
                           ),
                           borderRadius: const BorderRadius.horizontal(
@@ -286,15 +286,16 @@ class _StoreScreenState extends State<StoreScreen> {
                                 search = searchController.text;
                               });
                             },
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               hintText: '먹고 싶은 메뉴를 검색하세요!',
                               hintStyle: TextStyle(
-                                color: secondColor,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w300,
                                 fontSize: 15,
                               ),
                               prefixIcon: Icon(
                                 Icons.search,
-                                color: secondColor,
+                                color: Colors.grey,
                                 size: 23,
                               ),
                               enabledBorder: InputBorder.none,
@@ -308,7 +309,7 @@ class _StoreScreenState extends State<StoreScreen> {
                   const SizedBox(
                     height: 10,
                   ),
-                  SizedBox(
+                  /*SizedBox(
                     height: 100,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
@@ -341,7 +342,7 @@ class _StoreScreenState extends State<StoreScreen> {
                         );
                       },
                     ),
-                  ),
+                  ),*/
                   const SizedBox(
                     height: 12,
                   ),
@@ -374,64 +375,56 @@ class _StoreScreenState extends State<StoreScreen> {
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: filteredstore.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return Column(
-                            children: [
-                              Container(
-                                height: 85,
-                                width: pagewidth + 25,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
+                          return Card(
+                            elevation: 0.7,
+                            child: Container(
+                              height: 85,
+                              width: pagewidth + 25,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                              ),
+                              child: ListTile(
+                                tileColor: Colors.white,
+                                title: SizedBox(
+                                  width: 240,
+                                  child: Text(
+                                    filteredstore[index]["name"],
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 19),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
-                                child: ListTile(
-                                  tileColor: Colors.white,
-                                  title: SizedBox(
-                                    width: 240,
-                                    child: Text(
-                                      filteredstore[index]["name"],
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 19),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                                onTap: () async {
+                                  selectedgage = filteredstore[index]["name"];
+                                  menu = await loadmenu(selectedgage);
+                                  Navigator.of(context).push(
+                                    SwipeablePageRoute(
+                                      canOnlySwipeFromEdge: true,
+                                      builder: (BuildContext context) =>
+                                          MenuScreen(
+                                              selectedgage: selectedgage,
+                                              menu: menu,
+                                              category:
+                                                  filteredstore[index]
+                                                      ["category"],
+                                              finalorder: filteredstore[index]
+                                                  ["finalorder"],
+                                              tip: filteredstore[index]
+                                                  ["tip"]),
                                     ),
-                                  ),
-                                  onTap: () async {
-                                    selectedgage = filteredstore[index]["name"];
-                                    menu = await loadmenu(selectedgage);
-                                    Navigator.of(context).push(
-                                      SwipeablePageRoute(
-                                        canOnlySwipeFromEdge: true,
-                                        builder: (BuildContext context) =>
-                                            MenuScreen(
-                                                selectedgage: selectedgage,
-                                                menu: menu,
-                                                category:
-                                                    filteredstore[index]
-                                                        ["category"],
-                                                finalorder: filteredstore[index]
-                                                    ["finalorder"],
-                                                tip: filteredstore[index]
-                                                    ["tip"]),
-                                      ),
-                                    );
-                                  },
-                                  subtitle: Text(
-                                      '대표 메뉴: ${filteredstore[index]['menu']}',
-                                      maxLines: 1),
-                                  trailing: Text(
-                                    '${filteredstore[index]['category']}',
-                                    style: const TextStyle(fontSize: 13),
-                                  ),
+                                  );
+                                },
+                                subtitle: Text(
+                                    '대표 메뉴: ${filteredstore[index]['menu']}',
+                                    maxLines: 1),
+                                trailing: Text(
+                                  '${filteredstore[index]['category']}',
+                                  style: const TextStyle(fontSize: 13),
                                 ),
                               ),
-                              Divider(
-                                height: 0.2,
-                                color: secondColor,
-                                thickness: 0.7,
-                                indent: 15,
-                                endIndent: 15,
-                              ),
-                            ],
+                            ),
                           );
                         },
                       ),

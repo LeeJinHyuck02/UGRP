@@ -61,6 +61,8 @@ class _ChatscreenState extends State<Chatscreen> {
 
   @override
   void initState() {
+    chatID = widget.chatid;
+    
     super.initState();
 
     waitforchat();

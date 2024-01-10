@@ -32,6 +32,7 @@ class _CheckScreenState extends State<CheckScreen> {
   String currentlocation = '체인지업 그라운드';
   String userid = '';
   int locationid = 1;
+  bool insession = false;
 
   var deliveryprice = 5000;
   double totalOrderPrice = 0;
@@ -48,6 +49,62 @@ class _CheckScreenState extends State<CheckScreen> {
   void place() {}
   void backtoselect() {}
 
+  void dialog() {
+    showDialog(
+      context: context,
+      //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+          backgroundColor: Colors.white,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          //Dialog Main Title
+          title: const Column(
+            children: <Widget>[
+              Text(
+                "안내",
+                style: TextStyle(fontSize: 20),
+              ),
+            ],
+          ),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                "이미 세션에 참여 중이라면, 세션 생성 및 참여가 불가능합니다.",
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            SizedBox(
+              height: 35,
+              width: 80,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor, // Background color
+                ),
+                child: const Text(
+                  "확인",
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     int minutes = _duration.inMinutes;
@@ -57,6 +114,7 @@ class _CheckScreenState extends State<CheckScreen> {
     currentlocation = context.watch<UserProvider>().location;
     locationid = context.watch<UserProvider>().locationid;
     userid = context.watch<UserProvider>().userid;
+    insession = context.watch<UserProvider>().insession;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -74,32 +132,36 @@ class _CheckScreenState extends State<CheckScreen> {
         width: MediaQuery.of(context).size.width - 40,
         height: 45,
         child: FloatingActionButton.extended(
-          backgroundColor: Colors.grey[200],
+          backgroundColor: primaryColor,
           elevation: 0,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           onPressed: () {
-            addsession(
-                userid,
-                widget.userorder,
-                widget.selectedgage,
-                widget.category,
-                totalOrderPrice.round(),
-                widget.finalorder,
-                minutes,
-                locationid,
-                widget.tip);
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const HomeScreen(),
-              ),
-              (route) => false,
-            );
+            if (insession) {
+              dialog();
+            } else {
+              addsession(
+                  userid,
+                  widget.userorder,
+                  widget.selectedgage,
+                  widget.category,
+                  totalOrderPrice.round(),
+                  widget.finalorder,
+                  minutes,
+                  locationid,
+                  widget.tip);
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HomeScreen(),
+                ),
+                (route) => false,
+              );
+            }
           },
           icon: const Icon(
             Icons.shopping_cart,
-            color: Colors.black, // 아이콘의 색상 설정
+            color: Colors.white, // 아이콘의 색상 설정
           ),
           label: const Padding(
             padding: EdgeInsets.symmetric(
@@ -107,7 +169,7 @@ class _CheckScreenState extends State<CheckScreen> {
             child: Text(
               '배달 주문하기',
               style: TextStyle(
-                color: Colors.black,
+                color: Colors.white,
               ),
             ),
           ),
@@ -155,7 +217,7 @@ class _CheckScreenState extends State<CheckScreen> {
                             onPressed: backtoselect,
                             child: Text(
                               currentlocation,
-                              style: TextStyle(color: secondColor),
+                              style: const TextStyle(color: Colors.black),
                             ),
                           ),
                         ],
@@ -241,9 +303,14 @@ class _CheckScreenState extends State<CheckScreen> {
                                       children: [
                                         TextButton.icon(
                                           onPressed: backtoselect,
-                                          icon: const Icon(Icons.add),
-                                          label: const Text(
+                                          icon: Icon(
+                                            Icons.add,
+                                            color: primaryColor,
+                                          ),
+                                          label: Text(
                                             '옵션 추가',
+                                            style:
+                                                TextStyle(color: primaryColor),
                                           ),
                                         ),
                                       ],
